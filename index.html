@@ -22,8 +22,10 @@
     --shadow-sm: 2px 2px 0 rgba(26,26,46,0.9);
   }
   *{box-sizing:border-box;}
+  html{overflow-x:hidden;}
   body{
     margin:0;
+    overflow-x:hidden;
     background:var(--cream);
     background-image:
       radial-gradient(circle, rgba(26,26,46,0.05) 1.6px, transparent 1.6px);
@@ -131,6 +133,11 @@
     background:var(--ink);
     border-bottom:4px solid var(--ink);
     overflow-x:auto;
+  }
+  @media (max-width:480px){
+    nav.cat-nav{overflow-x:visible;}
+    .cat-nav-inner{flex-wrap:wrap;}
+    .cat-nav-inner a, .nav-dropdown > a{padding:10px 10px; font-size:12.5px;}
   }
   .cat-nav-inner{
     max-width:1180px;
@@ -301,6 +308,7 @@
     gap:12px;
     flex-wrap:wrap;
     position:relative;
+    z-index:1;
   }
   .hero-search{
     display:flex;
@@ -730,7 +738,7 @@
         </div>
       </div>
       <div class="header-contact">
-        <a class="btn btn-line" href="https://line.me/ti/p/7hy1HnSChM" target="_blank" rel="noopener">💬 LINE 詢問</a>
+        <a class="btn btn-line" href="https://line.me/ti/p/7hy1HnSChM">💬 LINE 詢問</a>
       </div>
     </div>
   </header>
@@ -832,7 +840,7 @@
             <div class="cart-modal-total">總計：NT$<span id="cart-modal-total">0</span></div>
             <div class="cart-modal-btns">
               <button type="button" id="cart-copy-btn" class="btn btn-tel">📋 複製清單</button>
-              <a id="cart-checkout-btn" class="btn btn-line" href="https://line.me/ti/p/7hy1HnSChM" target="_blank" rel="noopener">💬 LINE 預約時間取貨</a>
+              <a id="cart-checkout-btn" class="btn btn-line" href="https://line.me/ti/p/7hy1HnSChM">💬 LINE 預約時間取貨</a>
             </div>
           </div>
         </div>
@@ -891,13 +899,13 @@
       <div class="cta-block">
         <h3>找不到你要的積木或缺件？</h3>
         <p>提供「主題・系列名稱・年份・零件編號」，可以的話附上照片，我們協助確認庫存！</p>
-        <a class="btn" href="https://line.me/ti/p/7hy1HnSChM" target="_blank" rel="noopener">💬 請幫我找積木</a>
+        <a class="btn" href="https://line.me/ti/p/7hy1HnSChM">💬 請幫我找積木</a>
       </div>
     </main>
   </div>
 
   <footer>
-    <div class="foot-contact">💬 <a href="https://line.me/ti/p/7hy1HnSChM" target="_blank" rel="noopener" style="color:inherit; text-decoration:underline;">LINE 詢問</a>　　🕘 13:00-20:00（週二～週六）</div>
+    <div class="foot-contact">💬 <a href="https://line.me/ti/p/7hy1HnSChM" style="color:inherit; text-decoration:underline;">LINE 詢問</a>　　🕘 13:00-20:00（週二～週六）</div>
     <div class="foot-links">
       <a href="#" id="about-link-footer">關於本店</a>｜<a href="privacy.html">隱私權說明</a>｜<a href="#">常見問題</a>
     </div>
