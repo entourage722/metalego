@@ -655,8 +655,14 @@
     z-index:2;
   }
   .product-card.is-soldout{opacity:.65;}
-  .product-cat-row{display:flex; justify-content:space-between; align-items:center;}
-  .product-sku{font-size:14px; color:var(--ink); font-weight:900;}
+  .product-cat-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:6px;
+    flex-wrap:wrap;
+  }
+  .product-sku{font-size:14px; color:var(--ink); font-weight:900; flex-shrink:0;}
   .price-orig{
     font-size:11px;
     color:#999;
@@ -686,12 +692,21 @@
     background:var(--blue);
   }
   .product-body{padding:8px 12px 10px; line-height:1.25;}
-  .product-cat{font-size:11px; color:var(--red-dark); font-weight:700;}
+  .product-cat{
+    font-size:11px; color:var(--red-dark); font-weight:700;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0;
+  }
   .product-name{font-size:13.5px; font-weight:700; margin:2px 0 4px; line-height:1.2;}
   .product-listed-date{margin-top:0;}
-  .product-foot{display:flex; justify-content:space-between; align-items:center;}
-  .product-price{font-family:'Baloo 2'; font-weight:800; color:var(--red-dark); font-size:16px;}
-  .product-stock{font-size:11px; color:#888;}
+  .product-foot{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:6px;
+    flex-wrap:wrap;
+  }
+  .product-price{font-family:'Baloo 2'; font-weight:800; color:var(--red-dark); font-size:16px; white-space:nowrap;}
+  .product-stock{font-size:11px; color:#888; flex-shrink:0; white-space:nowrap;}
   .product-stock.is-low{color:#d9822b; font-weight:700;}
 
   .cta-block{
