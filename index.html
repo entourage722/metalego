@@ -749,6 +749,65 @@
     cursor:pointer;
   }
   .thumb-dot.active{background:var(--yellow);}
+  .product-thumb-img{cursor:zoom-in;}
+
+  /* ---------- Lightbox ---------- */
+  .lightbox-overlay{
+    display:none;
+    position:fixed; inset:0;
+    background:rgba(10,10,16,0.92);
+    z-index:1100;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  }
+  .lightbox-overlay.open{display:flex;}
+  .lightbox-img{
+    max-width:min(90vw, 640px);
+    max-height:80vh;
+    object-fit:contain;
+    border-radius:8px;
+    background:#fff;
+    box-shadow:0 0 40px rgba(0,0,0,0.5);
+  }
+  .lightbox-close{
+    position:absolute;
+    top:18px; right:18px;
+    width:40px; height:40px;
+    border-radius:50%;
+    border:2px solid rgba(255,255,255,0.5);
+    background:rgba(255,255,255,0.1);
+    color:#fff;
+    font-size:18px;
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .lightbox-close:hover{background:var(--red);}
+  .lightbox-nav{
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+    width:46px; height:46px;
+    border-radius:50%;
+    border:2px solid rgba(255,255,255,0.5);
+    background:rgba(255,255,255,0.1);
+    color:#fff;
+    font-size:26px;
+    line-height:1;
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .lightbox-nav:hover{background:var(--red);}
+  .lightbox-prev{left:14px;}
+  .lightbox-next{right:14px;}
+  .lightbox-dots{
+    position:absolute;
+    left:0; right:0; bottom:22px;
+    display:none;
+    justify-content:center;
+    gap:8px;
+  }
+  .lightbox-dots .thumb-dot{width:10px; height:10px;}
   .product-thumb .fallback-icon{
     width:100%; height:100%;
     display:flex; align-items:center; justify-content:center;
@@ -945,6 +1004,15 @@
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- 商品照片放大燈箱 -->
+      <div id="lightbox-overlay" class="lightbox-overlay">
+        <button type="button" id="lightbox-close" class="lightbox-close" aria-label="關閉">✕</button>
+        <button type="button" id="lightbox-prev" class="lightbox-nav lightbox-prev" aria-label="上一張">‹</button>
+        <img id="lightbox-img" class="lightbox-img" src="" alt="商品照片放大">
+        <button type="button" id="lightbox-next" class="lightbox-nav lightbox-next" aria-label="下一張">›</button>
+        <div id="lightbox-dots" class="lightbox-dots"></div>
       </div>
 
       <div class="hot-strip">
@@ -1483,6 +1551,57 @@
     }
   }
 
+  // ---------- 商品照片放大燈箱 ----------
+  let LIGHTBOX_URLS = [];
+  let LIGHTBOX_IDX = 0;
+
+  function renderLightbox(){
+    document.getElementById("lightbox-img").src = LIGHTBOX_URLS[LIGHTBOX_IDX];
+    const multi = LIGHTBOX_URLS.length > 1;
+    document.getElementById("lightbox-prev").style.display = multi ? "flex" : "none";
+    document.getElementById("lightbox-next").style.display = multi ? "flex" : "none";
+    const dotsEl = document.getElementById("lightbox-dots");
+    dotsEl.style.display = multi ? "flex" : "none";
+    dotsEl.innerHTML = multi
+      ? LIGHTBOX_URLS.map((_,i)=> `<span class="thumb-dot${i===LIGHTBOX_IDX?" active":""}" data-idx="${i}"></span>`).join("")
+      : "";
+    dotsEl.querySelectorAll(".thumb-dot").forEach(dot=>{
+      dot.addEventListener("click", ()=>{
+        LIGHTBOX_IDX = Number(dot.dataset.idx);
+        renderLightbox();
+      });
+    });
+  }
+  function openLightbox(urls, idx){
+    LIGHTBOX_URLS = urls;
+    LIGHTBOX_IDX = idx || 0;
+    renderLightbox();
+    document.getElementById("lightbox-overlay").classList.add("open");
+  }
+  function closeLightbox(){
+    document.getElementById("lightbox-overlay").classList.remove("open");
+  }
+  function lightboxPrev(){
+    LIGHTBOX_IDX = (LIGHTBOX_IDX - 1 + LIGHTBOX_URLS.length) % LIGHTBOX_URLS.length;
+    renderLightbox();
+  }
+  function lightboxNext(){
+    LIGHTBOX_IDX = (LIGHTBOX_IDX + 1) % LIGHTBOX_URLS.length;
+    renderLightbox();
+  }
+  document.getElementById("lightbox-close").addEventListener("click", closeLightbox);
+  document.getElementById("lightbox-prev").addEventListener("click", lightboxPrev);
+  document.getElementById("lightbox-next").addEventListener("click", lightboxNext);
+  document.getElementById("lightbox-overlay").addEventListener("click", (e)=>{
+    if (e.target.id === "lightbox-overlay") closeLightbox();
+  });
+  document.addEventListener("keydown", (e)=>{
+    if (!document.getElementById("lightbox-overlay").classList.contains("open")) return;
+    if (e.key === "Escape") closeLightbox();
+    if (e.key === "ArrowLeft") lightboxPrev();
+    if (e.key === "ArrowRight") lightboxNext();
+  });
+
   function probeImage(url){
     return new Promise(resolve=>{
       const img = new Image();
@@ -1508,6 +1627,7 @@
     const mainImg = cardEl.querySelector(".product-thumb-img");
     if (!mainImg) return; // 主圖本身都載入失敗的話，不啟用多圖切換
     const allUrls = [mainImg.getAttribute("src"), ...extraUrls];
+    cardEl.querySelector(".product-thumb")._imageUrls = allUrls;
     const dotsEl = cardEl.querySelector(".product-thumb-dots");
     dotsEl.innerHTML = allUrls.map((_,i)=> `<span class="thumb-dot${i===0?" active":""}" data-idx="${i}"></span>`).join("");
     dotsEl.querySelectorAll(".thumb-dot").forEach(dot=>{
@@ -1566,6 +1686,16 @@
       `;
       productGrid.appendChild(el);
       setupMultiImages(el, p.sku);
+
+      const thumbEl = el.querySelector(".product-thumb");
+      thumbEl.addEventListener("click", (e)=>{
+        if (e.target.closest(".thumb-dot")) return;
+        const mainImg = thumbEl.querySelector(".product-thumb-img");
+        if (!mainImg) return;
+        const urls = thumbEl._imageUrls || [mainImg.getAttribute("src")];
+        const startIdx = Math.max(0, urls.indexOf(mainImg.getAttribute("src")));
+        openLightbox(urls, startIdx);
+      });
     });
   }
   function renderDateFilter(products){
