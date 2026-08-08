@@ -180,13 +180,20 @@
     border-radius:0 0 10px 10px;
     box-shadow:var(--shadow);
     padding:16px 18px;
-    max-width:640px;
+    width:min(640px, calc(100vw - 24px));
     max-height:70vh;
     overflow-y:auto;
-    grid-template-columns:repeat(3, minmax(140px,1fr));
-    gap:4px 24px;
+    box-sizing:border-box;
+    grid-template-columns:repeat(3, minmax(0,1fr));
+    gap:4px 20px;
   }
   .nav-dropdown-panel.open{display:grid;}
+  @media (max-width:520px){
+    .nav-dropdown-panel{grid-template-columns:repeat(2, minmax(0,1fr));}
+  }
+  @media (max-width:340px){
+    .nav-dropdown-panel{grid-template-columns:1fr;}
+  }
   .nav-dropdown-item{
     display:flex;
     align-items:center;
@@ -330,6 +337,7 @@
   }
   .hero-search input{
     flex:1;
+    min-width:0;
     border:none;
     outline:none;
     padding:9px 12px;
@@ -344,6 +352,8 @@
     cursor:pointer;
     font-size:15px;
     border-left:3px solid var(--ink);
+    flex-shrink:0;
+    line-height:1;
   }
   .hero-search button:hover{background:#ffe066;}
 
@@ -361,6 +371,33 @@
     white-space:nowrap;
   }
   .cart-btn:hover{background:#333;}
+
+  .back-to-top{
+    position:fixed;
+    right:18px;
+    bottom:22px;
+    width:46px;
+    height:46px;
+    border-radius:50%;
+    border:2px solid rgba(26,26,46,0.35);
+    background:rgba(26,26,46,0.45);
+    color:#fff;
+    font-size:20px;
+    font-weight:900;
+    line-height:1;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:800;
+    opacity:0;
+    visibility:hidden;
+    transform:translateY(10px);
+    transition:opacity .25s ease, transform .25s ease, background .2s ease;
+  }
+  .back-to-top.show{opacity:1; visibility:visible; transform:translateY(0);}
+  .back-to-top:hover{background:rgba(210,0,31,0.8); border-color:rgba(255,255,255,0.6);}
+  .back-to-top:active{transform:scale(0.92);}
   .cart-btn #cart-count{color:var(--yellow); font-weight:900;}
 
   /* ---------- About / Pickup Modal ---------- */
@@ -933,6 +970,8 @@
     <div>© 你想像的樂高倉庫｜Since 2026・樂高拆售與整套現貨專門</div>
   </footer>
 
+  <button type="button" id="back-to-top" class="back-to-top" aria-label="回到頁首">↑</button>
+
 <script>
   const themeGrid = document.querySelector(".theme-grid");
   const themeIconMap = {
@@ -1005,13 +1044,18 @@
     const trigger = document.getElementById("nav-dropdown-trigger");
     const panel = document.getElementById("nav-dropdown-panel");
     const rect = trigger.getBoundingClientRect();
+    const margin = 12;
+    const panelWidth = panel.offsetWidth || 300;
+    let left = rect.left;
+    left = Math.min(left, window.innerWidth - panelWidth - margin);
+    left = Math.max(left, margin);
     panel.style.top = rect.bottom + "px";
-    panel.style.left = rect.left + "px";
+    panel.style.left = left + "px";
   }
   function openNavDropdown(){
-    positionNavDropdown();
     document.getElementById("nav-dropdown").classList.add("open");
     document.getElementById("nav-dropdown-panel").classList.add("open");
+    positionNavDropdown();
   }
   function closeNavDropdown(){
     document.getElementById("nav-dropdown").classList.remove("open");
@@ -1538,6 +1582,14 @@
       grid.appendChild(el);
     }
   })();
+
+  const backToTopBtn = document.getElementById("back-to-top");
+  window.addEventListener("scroll", ()=>{
+    backToTopBtn.classList.toggle("show", window.scrollY > 400);
+  });
+  backToTopBtn.addEventListener("click", ()=>{
+    window.scrollTo({top:0, behavior:"smooth"});
+  });
 </script>
 
 </body>
