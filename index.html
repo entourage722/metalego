@@ -733,6 +733,22 @@
     object-fit:contain;
     background:#fff;
   }
+  .product-thumb-dots{
+    position:absolute;
+    left:0; right:0; bottom:8px;
+    display:flex;
+    justify-content:center;
+    gap:5px;
+    z-index:3;
+  }
+  .thumb-dot{
+    width:8px; height:8px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.6);
+    border:1.5px solid var(--ink);
+    cursor:pointer;
+  }
+  .thumb-dot.active{background:var(--yellow);}
   .product-thumb .fallback-icon{
     width:100%; height:100%;
     display:flex; align-items:center; justify-content:center;
@@ -1466,6 +1482,45 @@
       img.outerHTML = `<div class="fallback-icon">${img.dataset.fallbackIcon}</div>`;
     }
   }
+
+  function probeImage(url){
+    return new Promise(resolve=>{
+      const img = new Image();
+      img.onload = ()=> resolve(true);
+      img.onerror = ()=> resolve(false);
+      img.src = url;
+    });
+  }
+
+  // 依序偵測 商品編號-2.jpg / -3.jpg / -4.jpg（jpg 找不到再試 png），
+  // 找到幾張就顯示幾個圓點，讓使用者可以在卡片上直接切換照片
+  async function setupMultiImages(cardEl, sku){
+    const extraUrls = [];
+    for (let idx=2; idx<=4; idx++){
+      let found = null;
+      for (const ext of ["jpg","png"]){
+        const url = `images/${sku}-${idx}.${ext}`;
+        if (await probeImage(url)) { found = url; break; }
+      }
+      if (found) extraUrls.push(found); else break;
+    }
+    if (extraUrls.length === 0) return;
+    const mainImg = cardEl.querySelector(".product-thumb-img");
+    if (!mainImg) return; // 主圖本身都載入失敗的話，不啟用多圖切換
+    const allUrls = [mainImg.getAttribute("src"), ...extraUrls];
+    const dotsEl = cardEl.querySelector(".product-thumb-dots");
+    dotsEl.innerHTML = allUrls.map((_,i)=> `<span class="thumb-dot${i===0?" active":""}" data-idx="${i}"></span>`).join("");
+    dotsEl.querySelectorAll(".thumb-dot").forEach(dot=>{
+      dot.addEventListener("click", (e)=>{
+        e.stopPropagation();
+        const idx = Number(dot.dataset.idx);
+        mainImg.src = allUrls[idx];
+        dotsEl.querySelectorAll(".thumb-dot").forEach(d=> d.classList.remove("active"));
+        dot.classList.add("active");
+      });
+    });
+  }
+
   function renderProducts(products, sourceLabel){
     if (sourceLabel !== undefined) CURRENT_SOURCE_LABEL = sourceLabel;
     const productGrid = document.querySelector(".product-grid");
@@ -1486,8 +1541,9 @@
       el.innerHTML = `
         ${p.soldOut ? '<div class="tag-soldout">無庫存</div>' : (isNew ? '<div class="tag-new">NEW</div>' : '')}
         <div class="product-thumb">
-          <img src="images/${p.sku}.jpg" alt="${p.name}" data-sku="${p.sku}" data-fallback-icon="${themeIconMap[p.cat] || '🧱'}"
+          <img class="product-thumb-img" src="images/${p.sku}.jpg" alt="${p.name}" data-sku="${p.sku}" data-fallback-icon="${themeIconMap[p.cat] || '🧱'}"
                onerror="handleThumbError(this);">
+          <div class="product-thumb-dots"></div>
         </div>
         <div class="product-body">
           <div class="product-cat-row">
@@ -1509,6 +1565,7 @@
         </div>
       `;
       productGrid.appendChild(el);
+      setupMultiImages(el, p.sku);
     });
   }
   function renderDateFilter(products){
