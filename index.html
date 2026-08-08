@@ -1543,9 +1543,17 @@
     return products.reduce((max,p)=> (p.listedYm && p.listedYm > max) ? p.listedYm : max, "");
   }
   function handleThumbError(img){
-    if (img.dataset.stage !== "png"){
+    const sku = img.dataset.sku;
+    const stage = img.dataset.stage; // undefined → 剛剛試的是 sku.jpg
+    if (!stage){
       img.dataset.stage = "png";
-      img.src = `images/${img.dataset.sku}.png`;
+      img.src = `images/${sku}.png`;
+    } else if (stage === "png"){
+      img.dataset.stage = "jpg1";
+      img.src = `images/${sku}-1.jpg`;
+    } else if (stage === "jpg1"){
+      img.dataset.stage = "png1";
+      img.src = `images/${sku}-1.png`;
     } else {
       img.outerHTML = `<div class="fallback-icon">${img.dataset.fallbackIcon}</div>`;
     }
