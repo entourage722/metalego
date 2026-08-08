@@ -22,10 +22,9 @@
     --shadow-sm: 2px 2px 0 rgba(26,26,46,0.9);
   }
   *{box-sizing:border-box;}
-  html{overflow-x:hidden; max-width:100%;}
+  html{max-width:100%;}
   body{
     margin:0;
-    overflow-x:hidden;
     max-width:100%;
     background:var(--cream);
     background-image:
@@ -44,6 +43,11 @@
   .brick-font{font-family:'Baloo 2','Noto Sans TC',sans-serif; font-weight:800;}
 
   /* ---------- Marquee ---------- */
+  .site-top-sticky{
+    position:sticky;
+    top:0;
+    z-index:950;
+  }
   .marquee-bar{
     background:var(--red);
     color:#fff;
@@ -782,38 +786,39 @@
 </head>
 <body>
 
-  <div class="marquee-bar">
-    <span>★★★你想像的樂高倉庫 開倉出清中 ★★★ 城市／星際大戰／忍者／科技 各大主題應有盡有 ★★★ LINE 詢問缺件最快速 ★★★</span>
+  <div class="site-top-sticky">
+    <div class="marquee-bar">
+      <span>★★★你想像的樂高倉庫 開倉出清中 ★★★ 城市／星際大戰／忍者／科技 各大主題應有盡有 ★★★ LINE 詢問缺件最快速 ★★★</span>
+    </div>
+
+    <header class="site-header">
+      <div class="header-inner">
+        <div class="logo-block">
+          <div class="logo-brick"></div>
+          <div class="logo-text">
+            <div class="title brick-font">你想像的樂高倉庫</div>
+            <div class="subtitle">原封整套・拆售單顆・缺件補件・開倉出清！</div>
+          </div>
+        </div>
+        <div class="header-contact">
+          <a class="btn btn-line" href="https://line.me/ti/p/7hy1HnSChM">💬 LINE 詢問</a>
+        </div>
+      </div>
+    </header>
+
+    <nav class="cat-nav">
+      <div class="cat-nav-inner">
+        <div class="nav-dropdown" id="nav-dropdown">
+          <a href="#" id="nav-dropdown-trigger">🧱 全部分類 ▾</a>
+          <div class="nav-dropdown-panel" id="nav-dropdown-panel">
+            <!-- 主題清單由 JS 動態產生 -->
+          </div>
+        </div>
+        <a href="#" id="deal-link">🔥 限時優惠</a>
+        <a href="#" id="about-link-nav">關於本店</a>
+      </div>
+    </nav>
   </div>
-
-  <header class="site-header">
-    <div class="header-inner">
-      <div class="logo-block">
-        <div class="logo-brick"></div>
-        <div class="logo-text">
-          <div class="title brick-font">你想像的樂高倉庫</div>
-          <div class="subtitle">原封整套・拆售單顆・缺件補件・開倉出清！</div>
-        </div>
-      </div>
-      <div class="header-contact">
-        <a class="btn btn-line" href="https://line.me/ti/p/7hy1HnSChM">💬 LINE 詢問</a>
-      </div>
-    </div>
-  </header>
-
-  <nav class="cat-nav">
-    <div class="cat-nav-inner">
-      <div class="nav-dropdown" id="nav-dropdown">
-        <a href="#" id="nav-dropdown-trigger">🧱 全部分類 ▾</a>
-        <div class="nav-dropdown-panel" id="nav-dropdown-panel">
-          <!-- 主題清單由 JS 動態產生 -->
-        </div>
-      </div>
-      <a href="#" id="deal-link">🔥 限時優惠</a>
-      <a href="#products">最新到貨</a>
-      <a href="#" id="about-link-nav">關於本店</a>
-    </div>
-  </nav>
 
   <div class="layout">
 
