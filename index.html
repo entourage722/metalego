@@ -325,6 +325,17 @@
     min-width:220px;
     max-width:420px;
   }
+  .nav-search{
+    margin-left:auto;
+    flex:0 1 260px;
+    min-width:160px;
+    max-width:260px;
+    margin-top:6px;
+    margin-bottom:6px;
+    border-width:2px;
+  }
+  .nav-search input{padding:6px 10px; font-size:12.5px;}
+  .nav-search button{padding:6px 10px; font-size:13px;}
   .hero-search input{
     flex:1;
     min-width:0;
@@ -867,6 +878,9 @@
         </div>
         <div class="header-contact">
           <a class="btn btn-line" href="https://line.me/ti/p/7hy1HnSChM">💬 LINE 詢問</a>
+          <button type="button" id="cart-btn" class="cart-btn">
+            🛒 購物車　<span id="cart-count">0</span> 件｜NT$<span id="cart-total">0</span>
+          </button>
         </div>
       </div>
     </header>
@@ -881,6 +895,10 @@
         </div>
         <a href="#" id="deal-link">🔥 限時優惠</a>
         <a href="#" id="about-link-nav">關於本店</a>
+        <div class="hero-search nav-search">
+          <input type="text" id="hero-search-input" placeholder="搜尋商品名稱、編號...">
+          <button type="button" id="hero-search-btn">🔍</button>
+        </div>
       </div>
     </nav>
   </div>
@@ -940,20 +958,6 @@
 
     <!-- MAIN -->
     <main>
-      <div class="hero">
-        <h1>找積木、找缺件、找人偶 一搜就到</h1>
-        <p>主題、系列、年份，一次搜齊。整套現貨與拆售單顆同步出清，缺件補件也能幫忙找。</p>
-        <div class="hero-actions">
-          <div class="hero-search">
-            <input type="text" id="hero-search-input" placeholder="搜尋商品名稱、編號...">
-            <button type="button" id="hero-search-btn">🔍</button>
-          </div>
-          <button type="button" id="cart-btn" class="cart-btn">
-            🛒 購物車　<span id="cart-count">0</span> 件｜NT$<span id="cart-total">0</span>
-          </button>
-        </div>
-      </div>
-
       <!-- 購物車彈窗 -->
       <div id="cart-modal-overlay" class="cart-modal-overlay">
         <div class="cart-modal">
