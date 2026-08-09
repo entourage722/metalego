@@ -125,19 +125,17 @@
   nav.cat-nav{
     background:var(--ink);
     border-bottom:4px solid var(--ink);
-    overflow-x:auto;
-  }
-  @media (max-width:480px){
-    nav.cat-nav{overflow-x:visible;}
-    .cat-nav-inner{flex-wrap:wrap;}
-    .cat-nav-inner a, .nav-dropdown > a{padding:10px 10px; font-size:12.5px;}
   }
   .cat-nav-inner{
     max-width:1180px;
     margin:0 auto;
     display:flex;
+    flex-wrap:wrap;
     gap:4px;
     padding:0 12px;
+  }
+  @media (max-width:480px){
+    .cat-nav-inner a, .nav-dropdown > a{padding:10px 10px; font-size:12.5px;}
   }
   .cat-nav-inner a{
     color:#fff;
