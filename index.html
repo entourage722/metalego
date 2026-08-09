@@ -522,6 +522,9 @@
     line-height:1;
   }
   .cart-item-qty button:hover{background:var(--yellow);}
+  .cart-item-qty button:disabled{background:#eee; color:#bbb; cursor:not-allowed;}
+  .cart-item-qty button:disabled:hover{background:#eee;}
+  .cart-item-maxnote{color:var(--red-dark); font-weight:700; margin-left:4px;}
   .cart-item-qty span{min-width:18px; text-align:center; font-weight:700; font-size:13px;}
   .cart-item-remove{
     flex:none;
@@ -1440,7 +1443,9 @@
   }
   function addToCart(sku){
     const product = ALL_PRODUCTS.find(p => p.sku === sku);
-    if (!product || product.soldOut) return;
+    if (!product || product.soldOut) return "soldout";
+    const currentQty = CART[sku] ? CART[sku].qty : 0;
+    if (currentQty >= product.stock) return "maxed"; // 已達庫存上限，不能再加
     if (CART[sku]) {
       CART[sku].qty += 1;
     } else {
@@ -1448,9 +1453,15 @@
     }
     saveCart();
     updateCartButton();
+    return "ok";
   }
   function changeQty(sku, delta){
     if (!CART[sku]) return;
+    if (delta > 0){
+      const product = ALL_PRODUCTS.find(p => p.sku === sku);
+      const maxStock = product ? product.stock : Infinity;
+      if (CART[sku].qty >= maxStock) return; // 已達庫存上限，+ 按鈕不生效
+    }
     CART[sku].qty += delta;
     if (CART[sku].qty <= 0) delete CART[sku];
     saveCart();
@@ -1476,20 +1487,25 @@
     if (items.length === 0){
       body.innerHTML = `<p class="cart-empty">購物車還是空的，去挑幾件喜歡的積木吧！</p>`;
     } else {
-      body.innerHTML = items.map(i => `
+      body.innerHTML = items.map(i => {
+        const product = ALL_PRODUCTS.find(p => p.sku === i.sku);
+        const maxStock = product ? product.stock : Infinity;
+        const atMax = i.qty >= maxStock;
+        return `
         <div class="cart-item">
           <div class="cart-item-info">
             <div class="cart-item-name">${i.name}</div>
-            <div class="cart-item-price">NT$${i.price.toLocaleString()} ／ 件</div>
+            <div class="cart-item-price">NT$${i.price.toLocaleString()} ／ 件${atMax ? `<span class="cart-item-maxnote">（庫存僅剩 ${maxStock} 件）</span>` : ""}</div>
           </div>
           <div class="cart-item-qty">
             <button type="button" data-action="dec" data-sku="${i.sku}">−</button>
             <span>${i.qty}</span>
-            <button type="button" data-action="inc" data-sku="${i.sku}">＋</button>
+            <button type="button" data-action="inc" data-sku="${i.sku}" ${atMax ? "disabled" : ""}>＋</button>
           </div>
           <button type="button" class="cart-item-remove" data-action="remove" data-sku="${i.sku}">✕</button>
         </div>
-      `).join("");
+      `;
+      }).join("");
     }
     document.getElementById("cart-modal-total").textContent = getCartTotal().toLocaleString();
   }
@@ -1530,9 +1546,16 @@
   document.querySelector(".product-grid").addEventListener("click", (e)=>{
     const btn = e.target.closest(".product-add-cart");
     if (!btn || btn.disabled) return;
-    addToCart(btn.dataset.sku);
-    btn.textContent = "✓ 已加入";
-    setTimeout(()=>{ btn.textContent = "🛒 加入購物車"; }, 900);
+    const result = addToCart(btn.dataset.sku);
+    const original = "🛒 加入購物車";
+    if (result === "ok"){
+      btn.textContent = "✓ 已加入";
+    } else if (result === "maxed"){
+      btn.textContent = "已達庫存上限";
+    } else {
+      btn.textContent = "無庫存";
+    }
+    setTimeout(()=>{ btn.textContent = original; }, 1000);
   });
   function buildCartSummaryText(){
     const items = getCartItems();
