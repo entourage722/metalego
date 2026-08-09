@@ -1812,4 +1812,25 @@
     });
     for(let i=0;i<startDow;i++){
       const el = document.createElement("div");
-      el.className = "day em
+      el.className = "day empty";
+      grid.appendChild(el);
+    }
+    for(let d=1; d<=daysInMonth; d++){
+      const el = document.createElement("div");
+      el.className = "day" + (d===now.getDate() ? " today" : "");
+      el.textContent = d;
+      grid.appendChild(el);
+    }
+  })();
+
+  const backToTopBtn = document.getElementById("back-to-top");
+  window.addEventListener("scroll", ()=>{
+    backToTopBtn.classList.toggle("show", window.scrollY > 400);
+  });
+  backToTopBtn.addEventListener("click", ()=>{
+    window.scrollTo({top:0, behavior:"smooth"});
+  });
+</script>
+
+</body>
+</html>
