@@ -1649,19 +1649,24 @@
     if (extraUrls.length === 0) return;
     const mainImg = cardEl.querySelector(".product-thumb-img");
     if (!mainImg) return; // 主圖本身都載入失敗的話，不啟用多圖切換
-    const allUrls = [mainImg.getAttribute("src"), ...extraUrls];
-    cardEl.querySelector(".product-thumb")._imageUrls = allUrls;
+    const thumbEl = cardEl.querySelector(".product-thumb");
+    thumbEl._extraUrls = extraUrls; // 只快取「額外照片」，主圖一律即時讀取，避免快取到還沒容錯完成的錯誤網址
     const dotsEl = cardEl.querySelector(".product-thumb-dots");
-    dotsEl.innerHTML = allUrls.map((_,i)=> `<span class="thumb-dot${i===0?" active":""}" data-idx="${i}"></span>`).join("");
+    const totalCount = 1 + extraUrls.length;
+    dotsEl.innerHTML = Array.from({length: totalCount}, (_,i)=> `<span class="thumb-dot${i===0?" active":""}" data-idx="${i}"></span>`).join("");
     dotsEl.querySelectorAll(".thumb-dot").forEach(dot=>{
       dot.addEventListener("click", (e)=>{
         e.stopPropagation();
         const idx = Number(dot.dataset.idx);
-        mainImg.src = allUrls[idx];
+        mainImg.src = (idx === 0) ? getResolvedMainSrc(mainImg) : extraUrls[idx-1];
         dotsEl.querySelectorAll(".thumb-dot").forEach(d=> d.classList.remove("active"));
         dot.classList.add("active");
       });
     });
+  }
+  // 主圖真正的網址：優先用「第一次成功載入時鎖定」的網址，避免拿到容錯過程中的中繼失敗網址
+  function getResolvedMainSrc(mainImg){
+    return mainImg.dataset.resolvedSrc || mainImg.getAttribute("src");
   }
 
   function renderProducts(products, sourceLabel){
@@ -1685,7 +1690,8 @@
         ${p.soldOut ? '<div class="tag-soldout">無庫存</div>' : (isNew ? '<div class="tag-new">NEW</div>' : '')}
         <div class="product-thumb">
           <img class="product-thumb-img" src="images/${p.sku}.jpg" alt="${p.name}" data-sku="${p.sku}" data-fallback-icon="${themeIconMap[p.cat] || '🧱'}"
-               onerror="handleThumbError(this);">
+               onerror="handleThumbError(this);"
+               onload="if(!this.dataset.resolvedSrc) this.dataset.resolvedSrc=this.getAttribute('src');">
           <div class="product-thumb-dots"></div>
         </div>
         <div class="product-body">
@@ -1715,8 +1721,12 @@
         if (e.target.closest(".thumb-dot")) return;
         const mainImg = thumbEl.querySelector(".product-thumb-img");
         if (!mainImg) return;
-        const urls = thumbEl._imageUrls || [mainImg.getAttribute("src")];
-        const startIdx = Math.max(0, urls.indexOf(mainImg.getAttribute("src")));
+        const currentSrc = mainImg.getAttribute("src");
+        const resolvedMainSrc = getResolvedMainSrc(mainImg);
+        const extra = thumbEl._extraUrls || [];
+        const urls = [resolvedMainSrc, ...extra];
+        // 如果現在畫面上顯示的是圓點切換過去的某張額外照片，燈箱要從那張開始，不要每次都跳回主圖
+        const startIdx = Math.max(0, urls.indexOf(currentSrc));
         openLightbox(urls, startIdx);
       });
     });
@@ -1802,25 +1812,4 @@
     });
     for(let i=0;i<startDow;i++){
       const el = document.createElement("div");
-      el.className = "day empty";
-      grid.appendChild(el);
-    }
-    for(let d=1; d<=daysInMonth; d++){
-      const el = document.createElement("div");
-      el.className = "day" + (d===now.getDate() ? " today" : "");
-      el.textContent = d;
-      grid.appendChild(el);
-    }
-  })();
-
-  const backToTopBtn = document.getElementById("back-to-top");
-  window.addEventListener("scroll", ()=>{
-    backToTopBtn.classList.toggle("show", window.scrollY > 400);
-  });
-  backToTopBtn.addEventListener("click", ()=>{
-    window.scrollTo({top:0, behavior:"smooth"});
-  });
-</script>
-
-</body>
-</html>
+      el.className = "day em
