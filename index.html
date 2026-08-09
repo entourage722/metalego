@@ -674,6 +674,20 @@
     grid-template-columns:repeat(auto-fill, minmax(210px,1fr));
     gap:16px;
   }
+  @media (max-width:600px){
+    .product-grid{
+      grid-template-columns:repeat(2, 1fr);
+      gap:10px;
+    }
+    .product-body{padding:7px 9px 8px;}
+    .product-name{font-size:12px; min-height:auto;}
+    .product-sku{font-size:12px;}
+    .product-cat{font-size:10px;}
+    .product-price{font-size:14px;}
+    .product-stock{font-size:10px;}
+    .price-orig{font-size:10px;}
+    .product-add-cart{font-size:10px; padding:5px 6px;}
+  }
   .product-card{
     background:var(--card);
     border:3px solid var(--ink);
@@ -1065,6 +1079,13 @@
       if (dealLink) dealLink.classList.remove("active-deal");
     }
   }
+  function clearSearchFilter(){
+    if (SELECTED_SEARCH){
+      SELECTED_SEARCH = "";
+      const searchInput = document.getElementById("hero-search-input");
+      if (searchInput) searchInput.value = "";
+    }
+  }
   const themeIconMap = {
     "蓋比娃娃屋":"🏠","Icons":"🏛️","建築":"🏙️","IDEAS":"💡","Minecraft":"⛏️",
     "Art":"🎨","Iconic":"🎃","科技 Technic":"⚙️","好朋友":"💛","Editions":"💿",
@@ -1107,6 +1128,7 @@
         themeGrid.querySelectorAll(".theme-card").forEach(c=> c.classList.remove("active"));
         if (SELECTED_THEME) el.classList.add("active");
         clearDealFilter();
+        clearSearchFilter();
         applyFilters();
         document.getElementById("products").scrollIntoView({behavior:"smooth", block:"start"});
       });
@@ -1126,6 +1148,7 @@
         SELECTED_THEME = t.name;
         renderThemes(ALL_PRODUCTS);
         clearDealFilter();
+        clearSearchFilter();
         applyFilters();
         closeNavDropdown();
         document.getElementById("products").scrollIntoView({behavior:"smooth", block:"start"});
@@ -1277,7 +1300,7 @@
   }
   function months_label_for_ym(ym){
     const [y, mo] = String(ym).split("-");
-    return `${y}年${Number(mo)}月`;
+    return mo ? `${y}年${Number(mo)}月` : `${y}年`;
   }
   function parseListedDate(raw){
     const s = String(raw || "").trim();
@@ -1286,6 +1309,12 @@
     if (!m) return null;
     const y = m[1], mo = String(m[2]).padStart(2,"0");
     return { ym: `${y}-${mo}`, label: `${y}年${Number(mo)}月` };
+  }
+  // 試算表沒填上架日期時，改用 Rebrickable 資料庫裡這個盒組的官方出產年份頂著（只有年，沒有月）
+  function fallbackYearDateInfo(sku){
+    const set = LEGO_SETS[String(sku).trim()];
+    if (!set || !set.y) return null;
+    return { ym: String(set.y), label: `${set.y}年` };
   }
   function mapRowsToProducts(rows){
     if (!rows || rows.length < 2) return null;
@@ -1301,7 +1330,8 @@
       .map(r => {
         const sku = String(r[colIndex.sku]).trim();
         const rawName = String(r[colIndex.name] || "").trim();
-        const dateInfo = colIndex.listedDate !== undefined ? parseListedDate(r[colIndex.listedDate]) : null;
+        const dateInfo = (colIndex.listedDate !== undefined ? parseListedDate(r[colIndex.listedDate]) : null)
+          || fallbackYearDateInfo(sku); // 上架日期沒填時，改用 Rebrickable 資料庫的官方年份頂著（只會有年，沒有月）
         const stock = colIndex.stock !== undefined ? Number(String(r[colIndex.stock]).replace(/[^0-9.\-]/g,"")) || 0 : 3;
         const status = stockStatus(stock);
         return {
@@ -1534,6 +1564,7 @@
       SELECTED_THEME = a.dataset.theme;
       renderThemes(ALL_PRODUCTS);
       clearDealFilter();
+      clearSearchFilter();
       applyFilters();
       document.getElementById("products").scrollIntoView({behavior:"smooth", block:"start"});
     });
