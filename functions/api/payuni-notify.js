@@ -15,7 +15,7 @@
 // 與 README-payuni-setup.md。
 // ============================================================
 
-import { payuniDecrypt, payuniSha256 } from "../_utils/payuni-crypto.js";
+import { payuniDecrypt, payuniSha256 } from "../utils/payuni-crypto.js";
 
 export async function onRequestPost(context) {
   const { request, env } = context;

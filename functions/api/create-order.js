@@ -14,7 +14,7 @@
 //     跟我說要開哪些支付方式即可調整。
 // ============================================================
 
-import { payuniEncrypt, payuniSha256, generateOrderNo } from "../_utils/payuni-crypto.js";
+import { payuniEncrypt, payuniSha256, generateOrderNo } from "../utils/payuni-crypto.js";
 
 // 測試區 / 正式區 API 網址（官方文件明確給的，正式上線前記得確認 IS_SANDBOX 設定）
 const API_URL = {

@@ -9,7 +9,7 @@
 // 這支主要負責「解密後，把結果轉成網址參數，導向靜態的 thankyou.html 頁面顯示給顧客看」。
 // ============================================================
 
-import { payuniDecrypt, payuniSha256 } from "../_utils/payuni-crypto.js";
+import { payuniDecrypt, payuniSha256 } from "../utils/payuni-crypto.js";
 
 export async function onRequestPost(context) {
   const { request, env } = context;
