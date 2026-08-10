@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>訂單完成｜你想像的樂高倉庫</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#fff6e6;
+    font-family:'Noto Sans TC', sans-serif;
+    color:#1a1a2e;
+    padding:20px;
+  }
+  .box{
+    background:#fff;
+    border:3px solid #1a1a2e;
+    border-radius:14px;
+    box-shadow:6px 6px 0 rgba(26,26,46,0.9);
+    max-width:440px;
+    width:100%;
+    padding:36px 28px;
+    text-align:center;
+  }
+  .icon{font-size:52px; margin-bottom:14px;}
+  h1{font-size:20px; margin:0 0 10px;}
+  p{font-size:14px; color:#555; line-height:1.7; margin:0 0 22px;}
+  .order-no{
+    background:#fff6e6;
+    border:2px dashed #d2001f;
+    border-radius:8px;
+    padding:10px;
+    font-weight:700;
+    color:#a5001a;
+    margin-bottom:22px;
+    font-size:13px;
+    word-break:break-all;
+  }
+  a.btn{
+    display:inline-block;
+    background:#ffcd00;
+    color:#1a1a2e;
+    font-weight:900;
+    text-decoration:none;
+    padding:12px 24px;
+    border:3px solid #1a1a2e;
+    border-radius:10px;
+    box-shadow:3px 3px 0 rgba(26,26,46,0.9);
+  }
+</style>
+</head>
+<body>
+  <div class="box">
+    <div class="icon" id="icon">✅</div>
+    <h1 id="heading">付款完成，謝謝你的訂購！</h1>
+    <p id="message">
+      我們已經收到你的付款通知，會盡快為你準備商品。<br>
+      如有任何問題，歡迎透過 LINE 與我們聯繫。
+    </p>
+    <div class="order-no" id="order-no-box" style="display:none;">
+      訂單編號：<span id="order-no-text"></span>
+    </div>
+    <a class="btn" href="index.html">← 回到賣場繼續逛逛</a>
+  </div>
+
+  <script>
+    // 網址參數由 /api/payuni-return 解密後導轉過來（見該 Function 說明）
+    const params = new URLSearchParams(window.location.search);
+    const status = params.get("status");
+    const orderNo = params.get("orderNo");
+
+    if (orderNo) {
+      document.getElementById("order-no-text").textContent = orderNo;
+      document.getElementById("order-no-box").style.display = "block";
+    }
+
+    if (status === "SUCCESS") {
+      // 維持預設的成功文案
+    } else if (status === "UNKNOWN") {
+      document.getElementById("icon").textContent = "⏳";
+      document.getElementById("heading").textContent = "訂單處理中";
+      document.getElementById("message").innerHTML =
+        "銀行授權確認中，請稍候，我們收到最終結果後會盡快與你聯繫。<br>如超過 15 分鐘仍未收到通知，歡迎透過 LINE 詢問。";
+    } else if (status === "UNAPPROVED") {
+      document.getElementById("icon").textContent = "🔍";
+      document.getElementById("heading").textContent = "訂單審查中";
+      document.getElementById("message").textContent = "你的訂單正在進行會員資格審查，請耐心等候通知。";
+    } else if (status === "error" || (status && status !== "SUCCESS")) {
+      document.getElementById("icon").textContent = "⚠️";
+      document.getElementById("heading").textContent = "付款未完成";
+      document.getElementById("message").innerHTML =
+        "這筆交易沒有成功，可能是取消付款或授權失敗。<br>如有疑問歡迎透過 LINE 與我們聯繫，我們協助確認狀況。";
+    }
+  </script>
+</body>
+</html>
