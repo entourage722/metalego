@@ -1087,6 +1087,12 @@
       if (searchInput) searchInput.value = "";
     }
   }
+  function clearThemeFilter(){
+    if (SELECTED_THEME){
+      SELECTED_THEME = "";
+      renderThemes(ALL_PRODUCTS);
+    }
+  }
   const themeIconMap = {
     "蓋比娃娃屋":"🏠","Icons":"🏛️","建築":"🏙️","IDEAS":"💡","Minecraft":"⛏️",
     "Art":"🎨","Iconic":"🎃","科技 Technic":"⚙️","好朋友":"💛","Editions":"💿",
@@ -1410,9 +1416,9 @@
     e.preventDefault();
     SELECTED_DEAL = !SELECTED_DEAL;
     document.getElementById("deal-link").classList.toggle("active-deal", SELECTED_DEAL);
-    if (SELECTED_DEAL && SELECTED_THEME){
-      SELECTED_THEME = ""; // 選限時優惠時，取消已選的主題篩選
-      renderThemes(ALL_PRODUCTS);
+    if (SELECTED_DEAL){
+      clearThemeFilter();
+      clearSearchFilter();
     }
     applyFilters();
     document.getElementById("products").scrollIntoView({behavior:"smooth", block:"start"});
@@ -1423,6 +1429,10 @@
   });
   function runHeroSearch(){
     SELECTED_SEARCH = document.getElementById("hero-search-input").value.trim();
+    if (SELECTED_SEARCH){
+      clearThemeFilter();
+      clearDealFilter();
+    }
     applyFilters();
     document.getElementById("products").scrollIntoView({behavior:"smooth", block:"start"});
   }
