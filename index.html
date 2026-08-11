@@ -1843,8 +1843,8 @@
     document.getElementById("stat-total").textContent = fmt(total);
   }, 4000);
   function updateInventoryStats(products){
-    const itemCount = products.length;
-    const totalStock = products.reduce((sum,p)=> sum + (Number(p.stock) || 0), 0);
+    const itemCount = products.filter(p => (Number(p.stock) || 0) > 0).length; // 在庫商品：有庫存的商品數量
+    const totalStock = products.reduce((sum,p)=> sum + (Number(p.stock) || 0), 0); // 現貨可出：庫存總數
     document.getElementById("stat-stock").textContent = fmt(itemCount);
     document.getElementById("stat-ready").textContent = fmt(totalStock);
     const noticeEl = document.getElementById("notice-stock-count");
