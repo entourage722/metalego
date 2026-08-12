@@ -10,7 +10,8 @@
 //   - 加解密邏輯已用官方測試向量驗證正確（見 payuni-crypto.js）
 //
 // 訂單記錄方式：收到付款通知後，呼叫 Google Apps Script Web App，
-// 把訂單資料寫進獨立的「訂單」Google 試算表。
+// 把訂單狀態更新進獨立的「訂單」Google 試算表，付款成功的話 Apps Script
+// 會順便去商品試算表把對應庫存扣掉（明細是 create-order.js 下單當下先存好的）。
 // Apps Script 程式碼跟部署步驟見 google-apps-script-payuni-orders.gs
 // 與 README-payuni-setup.md。
 // ============================================================
@@ -103,6 +104,7 @@ async function writeToSheet(env, result, isPaid) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       secret,
+      action: "notify",
       orderNo: result.MerTradeNo || "",
       status: isPaid ? "已付款" : result.Status || "",
       amount: result.TradeAmt || "",
