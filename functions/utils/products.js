@@ -74,3 +74,66 @@ export async function fetchAuthoritativeProducts(apiKey) {
 
   return map;
 }
+
+// ============================================================
+// KV 快取層
+// ============================================================
+// 結帳這種高頻率操作，如果每次都直接打 Google Sheets API，量大時容易撞到
+// Google 的配額限制，也讓每筆結帳多花不必要的時間。改成：
+//   - KV 裡有「還沒過期」的快取 → 直接回傳快取，完全不打 Sheets API
+//   - KV 沒有快取，或快取「過期」了 → 才真的打一次 Sheets API，
+//     並把結果連同「現在的時間」一起存回 KV，供接下來 CACHE_TTL_MS
+//     毫秒內的所有請求共用
+//
+// 效果：不管同一時間有幾筆訂單進來，每 CACHE_TTL_MS 毫秒最多只打 1 次
+// Google Sheets API，其餘全部吃快取，大幅降低 API 呼叫次數。
+//
+// 需要在 Cloudflare Pages 設定一個 KV 命名空間並綁定變數名稱 PRODUCTS_KV，
+// 步驟見 README-payuni-setup.md。如果沒有綁定 KV，會自動退回「每次都直接查」
+// 的舊行為，不影響正確性，只是少了省 API 呼叫次數的效果。
+// ============================================================
+
+const CACHE_KEY = "products-cache-v1";
+const CACHE_TTL_MS = 90 * 1000; // 90 秒，你可以依需求調整成 60~120 秒之間
+
+/**
+ * 取得商品資料，優先吃 KV 快取，快取過期或不存在才真的去查 Google Sheets。
+ * @param {string} apiKey - Google Sheets API 金鑰
+ * @param {KVNamespace} [kv] - Cloudflare KV 綁定（沒傳的話等同直接呼叫 fetchAuthoritativeProducts）
+ * @returns {Promise<Map<string,{price:number, stock:number, name:string}>>}
+ */
+export async function getCachedProducts(apiKey, kv) {
+  if (!kv) {
+    // 沒有綁定 KV，直接查，正確性不受影響，只是沒有省到 API 呼叫次數
+    return fetchAuthoritativeProducts(apiKey);
+  }
+
+  const cachedRaw = await kv.get(CACHE_KEY);
+  if (cachedRaw) {
+    try {
+      const cached = JSON.parse(cachedRaw);
+      const age = Date.now() - cached.timestamp;
+      if (age < CACHE_TTL_MS) {
+        return new Map(cached.entries); // 快取還新鮮，直接用，不打 Sheets API
+      }
+    } catch (e) {
+      // 快取內容壞掉，當作沒有快取，往下走重新查
+    }
+  }
+
+  // 快取不存在或已過期，真的去查一次 Google Sheets
+  const map = await fetchAuthoritativeProducts(apiKey);
+
+  // 存回 KV 給接下來的請求共用；這步失敗不影響這次結帳（只是這次沒省到而已）
+  try {
+    await kv.put(
+      CACHE_KEY,
+      JSON.stringify({ timestamp: Date.now(), entries: [...map.entries()] }),
+      { expirationTtl: 300 } // KV 自己保留 5 分鐘，比 CACHE_TTL_MS 長一點，避免邊界情況查無資料
+    );
+  } catch (e) {
+    console.warn("寫入 KV 快取失敗（不影響這次結帳）：", e.message);
+  }
+
+  return map;
+}

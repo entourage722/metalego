@@ -8,9 +8,16 @@
 // 與 https://docs.payuni.com.tw/web/#/7/56 （資料加密陣列）撰寫，
 // 加密邏輯已用官方測試向量驗證正確（見 payuni-crypto.js 開頭說明）。
 //
-// ✅ 安全性：金額不再信任前端傳來的數字，一律用 fetchAuthoritativeProducts()
+// ✅ 安全性：金額不再信任前端傳來的數字，一律用 getCachedProducts()
 //    向 Google 試算表撈「當下真實的價格與庫存」重新計算，並拒絕庫存不足的訂單。
 //    （原本這裡是 TODO，用前端傳來的 price 暫代，已修正。）
+//
+// ✅ 效能：商品資料透過 Cloudflare KV 快取（90秒），大量結帳時不會每筆
+//    都直接打 Google Sheets API，只有快取過期後的第一筆才會真的查詢。
+//    這代表庫存數字最多可能有 90 秒的些微延遲（例如快取期間內，理論上
+//    有極小機率讓兩筆訂單都通過「庫存夠不夠」的檢查，等實際扣庫存時
+//    才會發現不夠），對這個規模的小型賣場來說完全可以接受。
+//    沒有設定 PRODUCTS_KV 的話會自動退回「每次都直接查」，正確性不受影響。
 //
 // ⚠️ 還剩一個地方要等你確認：
 //   - 目前預設會顯示所有已在 PAYUNi 後台開通的支付方式（不指定 Credit/LinePay 等參數）。
@@ -23,7 +30,7 @@
 // ============================================================
 
 import { payuniEncrypt, payuniSha256, generateOrderNo } from "../utils/payuni-crypto.js";
-import { fetchAuthoritativeProducts } from "../utils/products.js";
+import { getCachedProducts } from "../utils/products.js";
 
 // 測試區 / 正式區 API 網址（官方文件明確給的，正式上線前記得確認 IS_SANDBOX 設定）
 const API_URL = {
@@ -65,7 +72,7 @@ export async function onRequestPost(context) {
   const SHEETS_API_KEY = env.SHEETS_API_KEY || "AIzaSyBAjH-Wpm06d-fWjNGfY56GuptBpcrQ-Po";
   let authoritativeProducts;
   try {
-    authoritativeProducts = await fetchAuthoritativeProducts(SHEETS_API_KEY);
+    authoritativeProducts = await getCachedProducts(SHEETS_API_KEY, env.PRODUCTS_KV);
   } catch (e) {
     return json({ ok: false, error: "商品資料讀取失敗，請稍後再試：" + e.message }, 502);
   }
