@@ -147,12 +147,13 @@
     display:flex;
     align-items:center;
     justify-content:center;
+    gap:6px;
     line-height:1;
   }
   .cat-nav-inner a:hover{background:var(--red);}
   #deal-link.active-deal{background:var(--red); color:var(--yellow);}
 
-  .nav-dropdown{display:inline-block;}
+  .nav-dropdown{display:flex; align-items:center;}
   .nav-dropdown > a{
     color:#fff;
     font-size:13.5px;
@@ -163,7 +164,20 @@
     display:flex;
     align-items:center;
     justify-content:center;
+    gap:6px;
     line-height:1;
+  }
+  .nav-icon{
+    display:inline-flex;
+    align-items:center;
+    line-height:1;
+    font-size:14px;
+  }
+  .nav-caret{
+    display:inline-flex;
+    align-items:center;
+    line-height:1;
+    font-size:11px;
   }
   .nav-dropdown.open > a, .nav-dropdown > a:hover{background:var(--red);}
   .nav-dropdown-panel{
@@ -910,12 +924,12 @@
     <nav class="cat-nav">
       <div class="cat-nav-inner">
         <div class="nav-dropdown" id="nav-dropdown">
-          <a href="#" id="nav-dropdown-trigger">🧱 全部分類 ▾</a>
+          <a href="#" id="nav-dropdown-trigger"><span class="nav-icon">🧱</span><span>全部分類</span><span class="nav-caret">▾</span></a>
           <div class="nav-dropdown-panel" id="nav-dropdown-panel">
             <!-- 主題清單由 JS 動態產生 -->
           </div>
         </div>
-        <a href="#" id="deal-link">🔥 限時優惠</a>
+        <a href="#" id="deal-link"><span class="nav-icon">🔥</span><span>限時優惠</span></a>
         <a href="#" id="about-link-nav">關於本店</a>
         <div class="hero-search nav-search">
           <input type="text" id="hero-search-input" placeholder="搜尋商品名稱、編號...">
