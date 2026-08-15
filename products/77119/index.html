@@ -32,6 +32,7 @@
   .breadcrumb{font-size:13px; color:#777; margin-bottom:14px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
   .breadcrumb a{color:var(--red-dark); text-decoration:none;}
   .cat-btn{display:inline-flex; align-items:center; gap:5px; background:#fff; color:var(--red-dark); text-decoration:none; font-weight:700; font-size:12.5px; padding:5px 11px; border:2px solid var(--ink); border-radius:20px; box-shadow:2px 2px 0 rgba(26,26,46,0.9);}
+  .home-icon{width:14px; height:14px; flex-shrink:0;}
   .cat-btn:hover{background:var(--yellow);}
   .card{background:var(--card); border:3px solid var(--ink); border-radius:14px; box-shadow:var(--shadow); overflow:hidden;}
   .thumb-main{width:100%; aspect-ratio:1/1; background:var(--red); display:flex; align-items:center; justify-content:center; border-bottom:3px solid var(--ink);}
@@ -50,9 +51,9 @@
   .stock{font-size:13px; color:#999; font-weight:700; margin-bottom:18px;}
   .btn-line{display:inline-flex; align-items:center; gap:8px; background:#06c755; color:#fff; font-weight:900; text-decoration:none; padding:13px 20px; border-radius:10px; border:3px solid var(--ink); box-shadow:var(--shadow); font-size:15px;}
   .action-row{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
-  .btn-add-cart{display:inline-flex; align-items:center; gap:8px; background:var(--ink); color:#fff; font-weight:900; text-decoration:none; padding:13px 20px; border-radius:10px; border:3px solid var(--ink); box-shadow:var(--shadow); font-size:15px; cursor:pointer; font-family:inherit;}
-  .btn-add-cart:hover{background:#333;}
-  .btn-add-cart:disabled{background:#ccc; border-color:#ccc; color:#888; cursor:not-allowed; box-shadow:none;}
+  .btn-add-cart{background:var(--ink); color:#fff; border:none; border-radius:6px; padding:13px 20px; font-size:15px; font-weight:700; cursor:pointer; font-family:'Noto Sans TC', sans-serif;}
+  .btn-add-cart:hover{background:var(--red);}
+  .btn-add-cart:disabled{background:#ccc; cursor:not-allowed;}
   .btn-back{display:inline-block; margin-top:18px; color:var(--red-dark); font-weight:700; text-decoration:none; font-size:14px;}
   .note{margin-top:22px; font-size:13px; color:#777; border-top:1px dashed #ddd; padding-top:14px;}
 </style>
@@ -81,8 +82,15 @@
   </header>
   <main>
     <div class="breadcrumb">
-      <a href="../../index.html">首頁</a> ／
-      <a class="cat-btn" href="../../index.html" title="回首頁看更多「音速小子」商品">💨 音速小子</a>
+      <a class="cat-btn" href="../../index.html" title="回首頁">
+        <svg class="home-icon" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+          <rect x="14" y="6" width="14" height="12" rx="2" fill="#d2001f" stroke="#1a1a2e" stroke-width="3"/>
+          <rect x="36" y="6" width="14" height="12" rx="2" fill="#d2001f" stroke="#1a1a2e" stroke-width="3"/>
+          <rect x="6" y="16" width="52" height="40" rx="7" fill="#d2001f" stroke="#1a1a2e" stroke-width="3.5"/>
+        </svg>
+        首頁
+      </a> ／
+      <a class="cat-btn" href="../../index.html?theme=%E9%9F%B3%E9%80%9F%E5%B0%8F%E5%AD%90" title="回首頁看更多「音速小子」商品">💨 音速小子</a>
       ／ 77119
     </div>
     <div class="card">
@@ -108,7 +116,7 @@
             data-sku="77119" data-name="Sonic塔爾斯的托爾內德號"
             data-price="770" data-stock="0"
             disabled>
-            🛒 無庫存
+            無庫存
           </button>
         </div>
         <div>
