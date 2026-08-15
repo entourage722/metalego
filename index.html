@@ -1844,6 +1844,11 @@
       });
     });
   }
+  function getThemeFromUrl(){
+    try {
+      return new URLSearchParams(location.search).get("theme") || "";
+    } catch (e) { return ""; }
+  }
   (async function initProducts(){
     loadCart();
     updateCartButton();
@@ -1854,7 +1859,19 @@
     ALL_PRODUCTS = products;
     NEWEST_YM = computeNewestYm(products);
     renderDateFilter(products);
-    renderProducts(products, sourceLabel);
+
+    // 從別的頁面（例如商品詳情頁的分類按鈕）帶著 ?theme=xxx 連過來時，自動選好該主題
+    const themeFromUrl = getThemeFromUrl();
+    if (themeFromUrl && products.some(p => p.cat === themeFromUrl)) {
+      SELECTED_THEME = themeFromUrl;
+    }
+
+    if (SELECTED_THEME) {
+      applyFilters();
+      document.getElementById("products").scrollIntoView({ block: "start" });
+    } else {
+      renderProducts(products, sourceLabel);
+    }
     renderThemes(products);
     renderNavDropdown(products);
     updateInventoryStats(products);
