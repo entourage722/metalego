@@ -1,0 +1,30 @@
+name: 同步待付款訂單到 Google 試算表
+
+# 每 5 分鐘呼叫一次 /api/sync-orders，把結帳時寫進 Cloudflare KV
+# 佇列裡的訂單，批次同步進 Google 試算表。
+# GitHub Actions 排程實際觸發時間可能有幾分鐘誤差（尖峰時段），
+# 這對這個用途沒有影響，佇列裡的訂單只會晚一點被同步，不會遺失。
+#
+# 也可以在 GitHub 上「Actions → 同步待付款訂單到 Google 試算表 →
+# Run workflow」手動立即觸發一次。
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch: {}
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 呼叫同步端點
+        run: |
+          http_code=$(curl -s -o /tmp/resp.json -w "%{http_code}" \
+            -X POST "https://metatoylego.com/api/sync-orders" \
+            -H "x-sync-secret: ${{ secrets.SYNC_SECRET }}")
+          echo "HTTP status: $http_code"
+          cat /tmp/resp.json
+          if [ "$http_code" -ge 400 ]; then
+            echo "同步失敗，HTTP $http_code"
+            exit 1
+          fi
