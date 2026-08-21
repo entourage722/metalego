@@ -16,6 +16,7 @@ const HEADER_ALIASES = {
   sku:   ["sku", "商品編號", "編號"],
   name:  ["name", "商品名稱", "名稱"],
   price: ["price", "特價", "售價"],
+  orig:  ["orig", "original", "原價"],
   stock: ["stock", "庫存", "庫存量", "數量"],
 };
 
@@ -64,7 +65,11 @@ export async function fetchAuthoritativeProducts(apiKey) {
   rows.slice(1).forEach((r) => {
     const sku = String(r[colIndex.sku] || "").trim();
     if (!sku) return;
-    const price = Number(String(r[colIndex.price] || "").replace(/[^0-9.]/g, "")) || 0;
+    const orig = colIndex.orig !== undefined
+      ? Number(String(r[colIndex.orig] || "").replace(/[^0-9.]/g, "")) || 0
+      : 0;
+    const rawPrice = Number(String(r[colIndex.price] || "").replace(/[^0-9.]/g, "")) || 0;
+    const price = rawPrice > 0 ? rawPrice : orig; // 特價/售價沒填時，先用原價頂著，避免結帳金額算成 NT$0
     const stock = colIndex.stock !== undefined
       ? Number(String(r[colIndex.stock] || "").replace(/[^0-9.\-]/g, "")) || 0
       : 3;
