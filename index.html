@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>你想像的樂高倉庫｜原封整套＋拆售單顆・開倉出清</title>
-<meta name="google-site-verification" content="lUO5Ch_bpDof8nAaw44INj7G8ecHVxK9-SYEL0oBp8Y" />
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='14' y='6' width='14' height='12' rx='2' fill='%23d2001f' stroke='%231a1a2e' stroke-width='3'/%3E%3Crect x='36' y='6' width='14' height='12' rx='2' fill='%23d2001f' stroke='%231a1a2e' stroke-width='3'/%3E%3Crect x='6' y='16' width='52' height='40' rx='7' fill='%23d2001f' stroke='%231a1a2e' stroke-width='3.5'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -665,6 +664,40 @@
   }
   .sort-select:hover{background:var(--stud);}
 
+  .products-header-right{display:flex; align-items:center; gap:14px; flex-wrap:wrap;}
+
+  .hide-soldout-toggle{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    font-size:12.5px;
+    font-weight:700;
+    color:var(--ink);
+    cursor:pointer;
+    user-select:none;
+  }
+  .hide-soldout-toggle input{position:absolute; opacity:0; width:0; height:0;}
+  .hide-soldout-toggle .toggle-track{
+    position:relative;
+    width:36px; height:20px;
+    background:#ccc;
+    border:2px solid var(--ink);
+    border-radius:20px;
+    flex:none;
+    transition:background 0.15s;
+  }
+  .hide-soldout-toggle .toggle-thumb{
+    position:absolute;
+    top:1px; left:1px;
+    width:14px; height:14px;
+    background:#fff;
+    border-radius:50%;
+    transition:transform 0.15s;
+  }
+  .hide-soldout-toggle input:checked + .toggle-track{background:var(--red);}
+  .hide-soldout-toggle input:checked + .toggle-track .toggle-thumb{transform:translateX(16px);}
+  .hide-soldout-toggle input:focus-visible + .toggle-track{outline:2px solid var(--ink); outline-offset:2px;}
+
   /* theme category grid */
   .theme-grid{
     display:flex;
@@ -1064,13 +1097,20 @@
 
       <div class="products-header">
         <h2 class="section-title" id="products">✪ 最新到貨</h2>
-        <select id="sort-select" class="sort-select">
-          <option value="">商品排序</option>
-          <option value="date-desc">上架時間：由新到舊</option>
-          <option value="date-asc">上架時間：由舊到新</option>
-          <option value="price-desc">價格：由高至低</option>
-          <option value="price-asc">價格：由低至高</option>
-        </select>
+        <div class="products-header-right">
+          <label class="hide-soldout-toggle" for="hide-soldout-switch">
+            <input type="checkbox" id="hide-soldout-switch">
+            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            隱藏無庫存
+          </label>
+          <select id="sort-select" class="sort-select">
+            <option value="">商品排序</option>
+            <option value="date-desc">上架時間：由新到舊</option>
+            <option value="date-asc">上架時間：由舊到新</option>
+            <option value="price-desc">價格：由高至低</option>
+            <option value="price-asc">價格：由低至高</option>
+          </select>
+        </div>
       </div>
       <div class="product-grid">
         <!-- product cards injected by JS -->
@@ -1409,6 +1449,8 @@
   let SELECTED_THEME = "";
   let SELECTED_YM = "";
   let SELECTED_SORT = "";
+  const HIDE_SOLDOUT_KEY = "brickWarehouseHideSoldOut";
+  let HIDE_SOLDOUT = localStorage.getItem(HIDE_SOLDOUT_KEY) === "1";
   function sortProducts(list, sortKey){
     const arr = [...list];
     switch (sortKey){
@@ -1433,6 +1475,7 @@
       const kw = SELECTED_SEARCH.toLowerCase();
       list = list.filter(p => p.name.toLowerCase().includes(kw) || p.sku.toLowerCase().includes(kw));
     }
+    if (HIDE_SOLDOUT) list = list.filter(p => !p.soldOut);
     list = sortProducts(list, SELECTED_SORT);
     renderProducts(list);
   }
@@ -1449,6 +1492,13 @@
   });
   document.getElementById("sort-select").addEventListener("change", (e)=>{
     SELECTED_SORT = e.target.value;
+    applyFilters();
+  });
+  const hideSoldOutSwitch = document.getElementById("hide-soldout-switch");
+  hideSoldOutSwitch.checked = HIDE_SOLDOUT;
+  hideSoldOutSwitch.addEventListener("change", (e)=>{
+    HIDE_SOLDOUT = e.target.checked;
+    try { localStorage.setItem(HIDE_SOLDOUT_KEY, HIDE_SOLDOUT ? "1" : "0"); } catch (err) {}
     applyFilters();
   });
   function runHeroSearch(){
@@ -1867,9 +1917,9 @@
       SELECTED_THEME = themeFromUrl;
     }
 
-    if (SELECTED_THEME) {
+    if (SELECTED_THEME || HIDE_SOLDOUT) {
       applyFilters();
-      document.getElementById("products").scrollIntoView({ block: "start" });
+      if (SELECTED_THEME) document.getElementById("products").scrollIntoView({ block: "start" });
     } else {
       renderProducts(products, sourceLabel);
     }
