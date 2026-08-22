@@ -57,7 +57,7 @@ export async function fetchAuthoritativeProducts(apiKey) {
     const idx = headers.findIndex((h) => aliases.map(normalizeHeader).includes(h));
     if (idx !== -1) colIndex[field] = idx;
   });
-  if (colIndex.sku === undefined || colIndex.price === undefined) {
+  if (colIndex.sku === undefined || (colIndex.price === undefined && colIndex.orig === undefined)) {
     throw new Error("試算表欄位格式異常，找不到商品編號或價格欄位");
   }
 
@@ -65,11 +65,14 @@ export async function fetchAuthoritativeProducts(apiKey) {
   rows.slice(1).forEach((r) => {
     const sku = String(r[colIndex.sku] || "").trim();
     if (!sku) return;
-    const orig = colIndex.orig !== undefined
+    const specialPrice = colIndex.price !== undefined
+      ? Number(String(r[colIndex.price] || "").replace(/[^0-9.]/g, "")) || 0
+      : 0;
+    const origPrice = colIndex.orig !== undefined
       ? Number(String(r[colIndex.orig] || "").replace(/[^0-9.]/g, "")) || 0
       : 0;
-    const rawPrice = Number(String(r[colIndex.price] || "").replace(/[^0-9.]/g, "")) || 0;
-    const price = rawPrice > 0 ? rawPrice : orig; // 特價/售價沒填時，先用原價頂著，避免結帳金額算成 NT$0
+    // 沒填特價的商品，用原價當作實際結帳價格，避免算成 0 元
+    const price = specialPrice || origPrice;
     const stock = colIndex.stock !== undefined
       ? Number(String(r[colIndex.stock] || "").replace(/[^0-9.\-]/g, "")) || 0
       : 3;

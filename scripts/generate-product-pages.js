@@ -161,15 +161,15 @@ function mapRowsToProducts(rows) {
       const sku = String(r[colIndex.sku]).trim();
       const rawName = String(r[colIndex.name] || "").trim();
       const stock = colIndex.stock !== undefined ? Number(String(r[colIndex.stock]).replace(/[^0-9.\-]/g, "")) || 0 : 3;
-      const orig = colIndex.orig !== undefined ? Number(String(r[colIndex.orig]).replace(/[^0-9.]/g, "")) || 0 : 0;
-      const rawPrice = colIndex.price !== undefined ? Number(String(r[colIndex.price]).replace(/[^0-9.]/g, "")) || 0 : 0;
+      const specialPrice = colIndex.price !== undefined ? Number(String(r[colIndex.price]).replace(/[^0-9.]/g, "")) || 0 : 0;
+      const origPrice = colIndex.orig !== undefined ? Number(String(r[colIndex.orig]).replace(/[^0-9.]/g, "")) || 0 : 0;
       return {
         sku,
         name: rawName || lookupFallbackName(sku) || sku,
         cat: lookupCategory(sku),
         year: lookupYear(sku),
-        price: rawPrice > 0 ? rawPrice : orig, // 特價/售價沒填時，先用原價頂著，避免顯示 NT$0
-        orig,
+        price: specialPrice || origPrice, // 沒填特價的話，用原價當作顯示/結帳價格
+        orig: origPrice,
         stock,
         soldOut: stock <= 0,
       };
@@ -370,7 +370,7 @@ function renderProductPage(p, images) {
         <h1 class="name">${escapeHtml(p.name)}</h1>
         <div class="sku">商品編號：${escapeHtml(p.sku)}</div>
         <div class="price-row">
-          ${p.orig > p.price ? `<span class="orig">NT$${p.orig.toLocaleString()}</span>` : ""}
+          ${(p.orig > 0 && p.orig !== p.price) ? `<span class="orig">NT$${p.orig.toLocaleString()}</span>` : ""}
           <span class="price">NT$${p.price.toLocaleString()}</span>
         </div>
         <div class="stock">${stockLabel}</div>

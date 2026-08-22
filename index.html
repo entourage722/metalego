@@ -1409,13 +1409,15 @@
           || fallbackYearDateInfo(sku); // 上架日期沒填時，改用 Rebrickable 資料庫的官方年份頂著（只會有年，沒有月）
         const stock = colIndex.stock !== undefined ? Number(String(r[colIndex.stock]).replace(/[^0-9.\-]/g,"")) || 0 : 3;
         const status = stockStatus(stock);
+        const specialPrice = colIndex.price !== undefined ? Number(String(r[colIndex.price]).replace(/[^0-9.]/g,"")) || 0 : 0;
+        const origPrice = colIndex.orig !== undefined ? Number(String(r[colIndex.orig]).replace(/[^0-9.]/g,"")) || 0 : 0;
         return {
           sku,
           name: rawName || lookupFallbackName(sku) || "（未命名商品）",
           cat: lookupCategory(sku),
           icon: colIndex.icon !== undefined ? String(r[colIndex.icon] || "").trim() : "",
-          price: colIndex.price !== undefined ? Number(String(r[colIndex.price]).replace(/[^0-9.]/g,"")) || 0 : 0,
-          orig: colIndex.orig !== undefined ? Number(String(r[colIndex.orig]).replace(/[^0-9.]/g,"")) || 0 : 0,
+          price: specialPrice || origPrice, // 沒填特價的話，用原價當作顯示/結帳價格
+          orig: origPrice,
           stock,
           soldOut: status.soldOut,
           stockLabel: status.label,
@@ -1849,7 +1851,7 @@
           ${p.listedLabel ? `<div class="product-listed-date">${p.listedLabel} 上架</div>` : ""}
           <div class="product-foot">
             <div>
-              ${p.orig ? `<span class="price-orig">NT$${p.orig.toLocaleString()}</span>` : ""}
+              ${(p.orig > 0 && p.orig !== p.price) ? `<span class="price-orig">NT$${p.orig.toLocaleString()}</span>` : ""}
               <span class="product-price">NT$${p.price.toLocaleString()}</span>
             </div>
             <div class="product-stock${(!p.soldOut && p.stock <= 2) ? " is-low" : ""}">${p.stockLabel}</div>
