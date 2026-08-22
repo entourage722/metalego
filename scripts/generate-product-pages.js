@@ -289,8 +289,9 @@ function renderProductPage(p, images) {
   .body{padding:16px 20px 24px;}
   .cat{color:var(--red-dark); font-weight:700; font-size:13px;}
   .name{font-size:20px; font-weight:900; margin:6px 0 10px; line-height:1.3;}
-  .sku{color:#888; font-size:12.5px; margin-bottom:14px;}
-  .price-row{display:flex; align-items:baseline; gap:10px; margin-bottom:6px;}
+  .sku{color:#888; font-size:12.5px; margin-bottom:4px;}
+  .pieces{color:#888; font-size:12.5px; margin-bottom:4px;}
+  .price-row{display:flex; align-items:baseline; gap:10px; margin-top:10px; margin-bottom:6px;}
   .price{font-family:'Baloo 2',sans-serif; font-weight:800; color:var(--red-dark); font-size:28px;}
   .orig{color:#999; text-decoration:line-through; font-size:15px;}
   .stock{font-size:13px; color:${p.soldOut ? "#999" : (p.stock <= 2 ? "#d9822b" : "#2a8f4f")}; font-weight:700; margin-bottom:18px;}
@@ -372,9 +373,10 @@ function renderProductPage(p, images) {
       </div>
       ${images.gallery.length > 1 ? `<div class="gallery">\n        ${galleryHtml}\n      </div>` : ""}
       <div class="body">
-        <div class="cat">${escapeHtml(p.cat)}${p.year ? `・${p.year}年` : ""}${p.pieces ? `・${p.pieces.toLocaleString()} pcs` : ""}</div>
+        <div class="cat">${escapeHtml(p.cat)}${p.year ? `・${p.year}年` : ""}</div>
         <h1 class="name">${escapeHtml(p.name)}</h1>
         <div class="sku">商品編號：${escapeHtml(p.sku)}</div>
+        ${p.pieces ? `<div class="pieces">樂高片數：${p.pieces.toLocaleString()}</div>` : ""}
         <div class="price-row">
           ${(p.orig > 0 && p.orig !== p.price) ? `<span class="orig">NT$${p.orig.toLocaleString()}</span>` : ""}
           <span class="price">NT$${p.price.toLocaleString()}</span>
