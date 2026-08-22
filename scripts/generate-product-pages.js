@@ -524,10 +524,19 @@ function renderProductPage(p, images) {
       refreshCartBadge();
       renderCartModal();
     });
+    function stripTrailingSkuFromName(name, sku) {
+      var suffixes = ['（' + sku + '）', '(' + sku + ')'];
+      for (var i = 0; i < suffixes.length; i++) {
+        if (name.slice(-suffixes[i].length) === suffixes[i]) {
+          return name.slice(0, -suffixes[i].length).trim();
+        }
+      }
+      return name;
+    }
     function buildCartSummaryText() {
       const items = getCartItems();
       if (items.length === 0) return '';
-      const lines = items.map(i => '・' + i.name + '（' + i.sku + '）x' + i.qty + '　NT$' + (i.price * i.qty).toLocaleString());
+      const lines = items.map(i => '・（' + i.sku + '）' + stripTrailingSkuFromName(i.name, i.sku) + ' x' + i.qty + '　NT$' + (i.price * i.qty).toLocaleString());
       lines.push('—— 總計 NT$' + getCartTotal().toLocaleString() + ' ——');
       return '我想預約取貨，商品如下：\\n' + lines.join('\\n');
     }

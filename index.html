@@ -1649,10 +1649,19 @@
     }
     setTimeout(()=>{ btn.textContent = original; }, 1000);
   });
+  function stripTrailingSkuFromName(name, sku){
+    // 有些商品名稱本身尾巴就帶了編號（例如「Friends-2026 年驚喜月曆（42698）」），
+    // 但清單前面已經會加一次（sku），這裡把名稱尾巴重複的編號拿掉，避免顯示兩次
+    const suffixes = [`（${sku}）`, `(${sku})`];
+    for (const suf of suffixes){
+      if (name.endsWith(suf)) return name.slice(0, -suf.length).trim();
+    }
+    return name;
+  }
   function buildCartSummaryText(){
     const items = getCartItems();
     if (items.length === 0) return "";
-    const lines = items.map(i => `・${i.name}（${i.sku}）x${i.qty}　NT$${(i.price*i.qty).toLocaleString()}`);
+    const lines = items.map(i => `・（${i.sku}）${stripTrailingSkuFromName(i.name, i.sku)} x${i.qty}　NT$${(i.price*i.qty).toLocaleString()}`);
     lines.push(`—— 總計 NT$${getCartTotal().toLocaleString()} ——`);
     return "我想預約取貨，商品如下：\n" + lines.join("\n");
   }
