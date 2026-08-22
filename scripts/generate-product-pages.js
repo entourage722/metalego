@@ -101,6 +101,10 @@ function lookupYear(sku) {
   const set = LEGO_SETS[String(sku).trim()];
   return set && set.y ? String(set.y) : "";
 }
+function lookupPieces(sku) {
+  const set = LEGO_SETS[String(sku).trim()];
+  return set && set.p ? Number(set.p) : 0;
+}
 
 // 主題圖示對照表（跟 index.html 的 themeIconMap 保持一致）
 const THEME_ICON_MAP = {
@@ -168,6 +172,7 @@ function mapRowsToProducts(rows) {
         name: rawName || lookupFallbackName(sku) || sku,
         cat: lookupCategory(sku),
         year: lookupYear(sku),
+        pieces: lookupPieces(sku),
         price: specialPrice || origPrice, // 沒填特價的話，用原價當作顯示/結帳價格
         orig: origPrice,
         stock,
@@ -211,7 +216,7 @@ function renderProductPage(p, images) {
   const url = `${SITE_URL}/products/${p.sku}/`;
   const title = `${p.name}（${p.sku}）｜你想像的樂高倉庫`;
   const priceText = `NT$${p.price.toLocaleString()}`;
-  const descParts = [p.name, p.cat, p.year ? `${p.year}年` : "", p.soldOut ? "目前無庫存" : `現貨 ${priceText}`, "原封整套／拆售單顆／缺件補件"];
+  const descParts = [p.name, p.cat, p.year ? `${p.year}年` : "", p.pieces ? `${p.pieces.toLocaleString()}pcs` : "", p.soldOut ? "目前無庫存" : `現貨 ${priceText}`, "原封整套／拆售單顆／缺件補件"];
   const description = descParts.filter(Boolean).join("・");
   const mainImageUrl = images.main ? `${SITE_URL}/images/${images.main}` : `${SITE_URL}/images/og-default.jpg`;
   const stockLabel = p.soldOut ? "無庫存" : (p.stock <= 2 ? `庫存量小 ${p.stock} 件` : "現貨供應");
@@ -228,6 +233,7 @@ function renderProductPage(p, images) {
     "category": p.cat,
     "image": mainImageUrl,
     "description": description,
+    ...(p.pieces ? { "additionalProperty": { "@type": "PropertyValue", "name": "片數", "value": p.pieces } } : {}),
     "offers": {
       "@type": "Offer",
       "url": url,
@@ -366,7 +372,7 @@ function renderProductPage(p, images) {
       </div>
       ${images.gallery.length > 1 ? `<div class="gallery">\n        ${galleryHtml}\n      </div>` : ""}
       <div class="body">
-        <div class="cat">${escapeHtml(p.cat)}${p.year ? `・${p.year}年` : ""}</div>
+        <div class="cat">${escapeHtml(p.cat)}${p.year ? `・${p.year}年` : ""}${p.pieces ? `・${p.pieces.toLocaleString()} pcs` : ""}</div>
         <h1 class="name">${escapeHtml(p.name)}</h1>
         <div class="sku">商品編號：${escapeHtml(p.sku)}</div>
         <div class="price-row">

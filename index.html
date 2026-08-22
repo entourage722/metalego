@@ -1391,6 +1391,10 @@
     if (!set || !set.y) return null;
     return { ym: String(set.y), label: `${set.y}年` };
   }
+  function lookupPieces(sku){
+    const set = LEGO_SETS[String(sku).trim()];
+    return (set && set.p) ? Number(set.p) : 0;
+  }
   function mapRowsToProducts(rows){
     if (!rows || rows.length < 2) return null;
     const headers = rows[0].map(normalizeHeader);
@@ -1415,6 +1419,7 @@
           sku,
           name: rawName || lookupFallbackName(sku) || "（未命名商品）",
           cat: lookupCategory(sku),
+          pieces: lookupPieces(sku),
           icon: colIndex.icon !== undefined ? String(r[colIndex.icon] || "").trim() : "",
           price: specialPrice || origPrice, // 沒填特價的話，用原價當作顯示/結帳價格
           orig: origPrice,
@@ -1857,7 +1862,7 @@
             <span class="product-sku">${p.sku}</span>
           </div>
           <a class="product-name-link" href="products/${p.sku}/" title="查看「${p.name}」商品詳情"><div class="product-name">${p.name}</div></a>
-          ${p.listedLabel ? `<div class="product-listed-date">${p.listedLabel} 上架</div>` : ""}
+          ${(p.listedLabel || p.pieces) ? `<div class="product-listed-date">${[p.listedLabel ? `${p.listedLabel} 上架` : "", p.pieces ? `${p.pieces.toLocaleString()} pcs` : ""].filter(Boolean).join("・")}</div>` : ""}
           <div class="product-foot">
             <div>
               ${(p.orig > 0 && p.orig !== p.price) ? `<span class="price-orig">NT$${p.orig.toLocaleString()}</span>` : ""}
