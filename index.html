@@ -1541,6 +1541,7 @@
   function addToCart(sku){
     const product = ALL_PRODUCTS.find(p => p.sku === sku);
     if (!product || product.soldOut) return "soldout";
+    if (product.price <= 0) return "noprice";
     const currentQty = CART[sku] ? CART[sku].qty : 0;
     if (currentQty >= product.stock) return "maxed"; // 已達庫存上限，不能再加
     if (CART[sku]) {
@@ -1649,6 +1650,8 @@
       btn.textContent = "✓ 已加入";
     } else if (result === "maxed"){
       btn.textContent = "已達庫存上限";
+    } else if (result === "noprice"){
+      btn.textContent = "尚未定價";
     } else {
       btn.textContent = "無庫存";
     }
@@ -1870,8 +1873,8 @@
             </div>
             <div class="product-stock${(!p.soldOut && p.stock <= 2) ? " is-low" : ""}">${p.stockLabel}</div>
           </div>
-          <button type="button" class="product-add-cart" data-sku="${p.sku}" ${p.soldOut ? "disabled" : ""}>
-            ${p.soldOut ? "無庫存" : "🛒 加入購物車"}
+          <button type="button" class="product-add-cart" data-sku="${p.sku}" ${(p.soldOut || p.price <= 0) ? "disabled" : ""}>
+            ${p.soldOut ? "無庫存" : (p.price <= 0 ? "尚未定價" : "🛒 加入購物車")}
           </button>
         </div>
       `;

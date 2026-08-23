@@ -387,8 +387,8 @@ function renderProductPage(p, images) {
           <button type="button" class="btn-add-cart" id="add-cart-btn"
             data-sku="${escapeHtml(p.sku)}" data-name="${escapeHtml(p.name)}"
             data-price="${p.price}" data-stock="${p.stock}"
-            ${p.soldOut ? "disabled" : ""}>
-            ${p.soldOut ? "無庫存" : "🛒 加入購物車"}
+            ${(p.soldOut || p.price <= 0) ? "disabled" : ""}>
+            ${p.soldOut ? "無庫存" : (p.price <= 0 ? "尚未定價" : "🛒 加入購物車")}
           </button>
         </div>
         <div>
@@ -457,6 +457,11 @@ function renderProductPage(p, images) {
         const currentQty = cart[sku] ? cart[sku].qty : 0;
         const original = '🛒 加入購物車';
 
+        if (price <= 0) {
+          addBtn.textContent = '尚未定價';
+          setTimeout(() => { addBtn.textContent = original; }, 1000);
+          return;
+        }
         if (currentQty >= stock) {
           addBtn.textContent = '已達庫存上限';
           setTimeout(() => { addBtn.textContent = original; }, 1000);

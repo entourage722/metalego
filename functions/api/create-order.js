@@ -19,15 +19,6 @@
 //    才會發現不夠），對這個規模的小型賣場來說完全可以接受。
 //    沒有設定 PRODUCTS_KV 的話會自動退回「每次都直接查」，正確性不受影響。
 //
-// ✅ 可靠性：結帳當下不再「即時」呼叫 Google Apps Script 寫入訂單試算表
-//    （這一步之前實測過，瞬間大量結帳時 Google 那邊會因為同時執行數限制
-//    直接把大部分請求擋掉，導致訂單記錄大量遺失）。
-//    現在改成：結帳當下只把訂單資料寫進 Cloudflare KV（幾乎不會失敗、
-//    也沒有 Google 那邊的併發限制問題），真正「寫進 Google 試算表」這件事
-//    交給 /api/sync-orders 這支背景排程去做，一筆一筆循序處理，
-//    天然避開 Google 的同時執行數限制。細節見 functions/api/sync-orders.js
-//    開頭的說明。
-//
 // ⚠️ 還剩一個地方要等你確認：
 //   - 目前預設會顯示所有已在 PAYUNi 後台開通的支付方式（不指定 Credit/LinePay 等參數）。
 //     如果你只想開放信用卡+LINE Pay，之後可以加 Credit=1&LinePay=1 這類參數，
@@ -98,6 +89,9 @@ export async function onRequestPost(context) {
     if (!real) {
       return json({ ok: false, error: `商品 ${sku} 已下架或不存在，請重新整理購物車` }, 400);
     }
+    if (real.price <= 0) {
+      return json({ ok: false, error: `「${real.name || sku}」尚未定價，無法結帳，請從購物車移除` }, 400);
+    }
     if (qty > real.stock) {
       return json({ ok: false, error: `「${real.name || sku}」庫存只剩 ${real.stock} 件，請調整購買數量` }, 400);
     }
@@ -137,14 +131,14 @@ export async function onRequestPost(context) {
   const encryptInfo = await payuniEncrypt(plainText, HASH_KEY, HASH_IV);
   const hashInfo = await payuniSha256(encryptInfo, HASH_KEY, HASH_IV);
 
-  // 先把「這筆訂單買了哪些商品、各買幾件」寫進 Cloudflare KV 佇列，
+  // 先把「這筆訂單買了哪些商品、各買幾件」記一筆「待付款」到訂單試算表，
   // 之後 PAYUNi 通知付款成功時，才有明細可以回頭查、拿去扣商品庫存。
-  // 這一步只是寫 KV，幾乎不會失敗，也不會因為大量結帳而互相卡住；
-  // 真正寫進 Google 試算表的動作交給 /api/sync-orders 背景排程處理。
+  // 這步失敗不擋結帳（顧客還是能正常付款），只是之後會少了自動扣庫存的依據，
+  // 錯誤只記錄不中斷流程。
   try {
-    await queuePendingOrder(env, merTradeNo, totalAmount, prodDesc, verifiedItems);
+    await recordPendingOrder(env, merTradeNo, totalAmount, prodDesc, verifiedItems);
   } catch (e) {
-    console.error("寫入待同步訂單佇列失敗（不影響結帳）：", e.message);
+    console.error("記錄待付款訂單失敗（不影響結帳）：", e.message);
   }
 
   return json({
@@ -162,27 +156,31 @@ export async function onRequestPost(context) {
   });
 }
 
-/** 把「待付款」訂單寫進 Cloudflare KV 佇列，等 /api/sync-orders 背景排程批次同步到 Google 試算表 */
-async function queuePendingOrder(env, orderNo, amount, itemDesc, items) {
-  const kv = env.PRODUCTS_KV;
-  if (!kv) {
-    console.warn("尚未綁定 PRODUCTS_KV，略過寫入待同步訂單佇列（請依 README-payuni-setup.md 設定 KV）");
+/** 呼叫 Google Apps Script，記錄一筆「待付款」訂單，附上完整商品明細 */
+async function recordPendingOrder(env, orderNo, amount, itemDesc, items) {
+  const url = env.GAS_WEBHOOK_URL;
+  const secret = env.GAS_WEBHOOK_SECRET;
+  if (!url || !secret) {
+    console.warn("尚未設定 GAS_WEBHOOK_URL / GAS_WEBHOOK_SECRET，略過記錄待付款訂單");
     return;
   }
 
-  const key = `pending-order:${orderNo}`;
-  await kv.put(
-    key,
-    JSON.stringify({
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      secret,
+      action: "create",
       orderNo,
       amount,
       itemDesc,
       items: items.map((i) => ({ sku: i.sku, qty: i.qty })), // 扣庫存只需要 sku 跟數量
-      createdAt: Date.now(),
-    })
-    // 不設定 expirationTtl：這是真實訂單記錄，寧可讓它一直留在佇列裡等重試，
-    // 也不要讓它因為過期自動消失、悄悄漏掉。/api/sync-orders 同步成功後才會刪除。
-  );
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Apps Script 回應 ${res.status}：${await res.text()}`);
+  }
 }
 
 function json(data, status = 200) {
