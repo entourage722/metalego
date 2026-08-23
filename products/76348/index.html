@@ -9,11 +9,11 @@
 <meta property="og:type" content="product">
 <meta property="og:title" content="Epic Battle Avengers Doomsday（76348）｜你想像的樂高倉庫">
 <meta property="og:description" content="Epic Battle Avengers Doomsday・漫威英雄・2026年・目前無庫存・原封整套／拆售單顆／缺件補件">
-<meta property="og:image" content="https://metatoylego.com/images/og-default.jpg">
+<meta property="og:image" content="https://metatoylego.com/images/76348-1.jpg">
 <meta property="og:url" content="https://metatoylego.com/products/76348/">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='14' y='6' width='14' height='12' rx='2' fill='%23d2001f' stroke='%231a1a2e' stroke-width='3'/%3E%3Crect x='36' y='6' width='14' height='12' rx='2' fill='%23d2001f' stroke='%231a1a2e' stroke-width='3'/%3E%3Crect x='6' y='16' width='52' height='40' rx='7' fill='%23d2001f' stroke='%231a1a2e' stroke-width='3.5'/%3E%3C/svg%3E">
-<script type="application/ld+json">{"@context":"https://schema.org/","@type":"Product","name":"Epic Battle Avengers Doomsday","sku":"76348","category":"漫威英雄","image":"https://metatoylego.com/images/og-default.jpg","description":"Epic Battle Avengers Doomsday・漫威英雄・2026年・目前無庫存・原封整套／拆售單顆／缺件補件","offers":{"@type":"Offer","url":"https://metatoylego.com/products/76348/","priceCurrency":"TWD","price":0,"availability":"https://schema.org/OutOfStock"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org/","@type":"Product","name":"Epic Battle Avengers Doomsday","sku":"76348","category":"漫威英雄","image":"https://metatoylego.com/images/76348-1.jpg","description":"Epic Battle Avengers Doomsday・漫威英雄・2026年・目前無庫存・原封整套／拆售單顆／缺件補件","offers":{"@type":"Offer","url":"https://metatoylego.com/products/76348/","priceCurrency":"TWD","price":0,"availability":"https://schema.org/OutOfStock"}}</script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Baloo+2:wght@700;800&display=swap" rel="stylesheet">
 <style>
   :root{ --ink:#1a1a2e; --red:#d2001f; --red-dark:#a5001a; --yellow:#ffcd00; --cream:#fff6e6; --card:#fff; --shadow:4px 4px 0 rgba(26,26,46,0.9); }
@@ -44,8 +44,9 @@
   .body{padding:16px 20px 24px;}
   .cat{color:var(--red-dark); font-weight:700; font-size:13px;}
   .name{font-size:20px; font-weight:900; margin:6px 0 10px; line-height:1.3;}
-  .sku{color:#888; font-size:12.5px; margin-bottom:14px;}
-  .price-row{display:flex; align-items:baseline; gap:10px; margin-bottom:6px;}
+  .sku{color:#888; font-size:12.5px; margin-bottom:4px;}
+  .pieces{color:#888; font-size:12.5px; margin-bottom:4px;}
+  .price-row{display:flex; align-items:baseline; gap:10px; margin-top:10px; margin-bottom:6px;}
   .price{font-family:'Baloo 2',sans-serif; font-weight:800; color:var(--red-dark); font-size:28px;}
   .orig{color:#999; text-decoration:line-through; font-size:15px;}
   .stock{font-size:13px; color:#999; font-weight:700; margin-bottom:18px;}
@@ -123,13 +124,14 @@
     </div>
     <div class="card">
       <div class="thumb-main">
-        <div class="fallback">🧱</div>
+        <img src="../../images/76348-1.jpg" alt="Epic Battle Avengers Doomsday">
       </div>
       
       <div class="body">
         <div class="cat">漫威英雄・2026年</div>
         <h1 class="name">Epic Battle Avengers Doomsday</h1>
         <div class="sku">商品編號：76348</div>
+        
         <div class="price-row">
           
           <span class="price">NT$0</span>
@@ -285,10 +287,19 @@
       refreshCartBadge();
       renderCartModal();
     });
+    function stripTrailingSkuFromName(name, sku) {
+      var suffixes = ['（' + sku + '）', '(' + sku + ')'];
+      for (var i = 0; i < suffixes.length; i++) {
+        if (name.slice(-suffixes[i].length) === suffixes[i]) {
+          return name.slice(0, -suffixes[i].length).trim();
+        }
+      }
+      return name;
+    }
     function buildCartSummaryText() {
       const items = getCartItems();
       if (items.length === 0) return '';
-      const lines = items.map(i => '・' + i.name + '（' + i.sku + '）x' + i.qty + '　NT$' + (i.price * i.qty).toLocaleString());
+      const lines = items.map(i => '・（' + i.sku + '）' + stripTrailingSkuFromName(i.name, i.sku) + ' x' + i.qty + '　NT$' + (i.price * i.qty).toLocaleString());
       lines.push('—— 總計 NT$' + getCartTotal().toLocaleString() + ' ——');
       return '我想預約取貨，商品如下：\n' + lines.join('\n');
     }
