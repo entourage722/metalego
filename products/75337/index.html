@@ -142,8 +142,8 @@
           <button type="button" class="btn-add-cart" id="add-cart-btn"
             data-sku="75337" data-name="全地域型戰術執行者 AT-TE"
             data-price="0" data-stock="1"
-            >
-            🛒 加入購物車
+            disabled>
+            尚未定價
           </button>
         </div>
         <div>
@@ -212,6 +212,11 @@
         const currentQty = cart[sku] ? cart[sku].qty : 0;
         const original = '🛒 加入購物車';
 
+        if (price <= 0) {
+          addBtn.textContent = '尚未定價';
+          setTimeout(() => { addBtn.textContent = original; }, 1000);
+          return;
+        }
         if (currentQty >= stock) {
           addBtn.textContent = '已達庫存上限';
           setTimeout(() => { addBtn.textContent = original; }, 1000);

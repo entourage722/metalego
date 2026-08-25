@@ -4,16 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DISNEY-2026 年驚喜月曆（43298）｜你想像的樂高倉庫</title>
-<meta name="description" content="DISNEY-2026 年驚喜月曆・節慶系列・2026年・現貨 NT$909・原封整套／拆售單顆／缺件補件">
+<meta name="description" content="DISNEY-2026 年驚喜月曆・節慶系列・2026年・現貨 NT$910・原封整套／拆售單顆／缺件補件">
 <link rel="canonical" href="https://metatoylego.com/products/43298/">
 <meta property="og:type" content="product">
 <meta property="og:title" content="DISNEY-2026 年驚喜月曆（43298）｜你想像的樂高倉庫">
-<meta property="og:description" content="DISNEY-2026 年驚喜月曆・節慶系列・2026年・現貨 NT$909・原封整套／拆售單顆／缺件補件">
+<meta property="og:description" content="DISNEY-2026 年驚喜月曆・節慶系列・2026年・現貨 NT$910・原封整套／拆售單顆／缺件補件">
 <meta property="og:image" content="https://metatoylego.com/images/43298-1.jpg">
 <meta property="og:url" content="https://metatoylego.com/products/43298/">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='14' y='6' width='14' height='12' rx='2' fill='%23d2001f' stroke='%231a1a2e' stroke-width='3'/%3E%3Crect x='36' y='6' width='14' height='12' rx='2' fill='%23d2001f' stroke='%231a1a2e' stroke-width='3'/%3E%3Crect x='6' y='16' width='52' height='40' rx='7' fill='%23d2001f' stroke='%231a1a2e' stroke-width='3.5'/%3E%3C/svg%3E">
-<script type="application/ld+json">{"@context":"https://schema.org/","@type":"Product","name":"DISNEY-2026 年驚喜月曆","sku":"43298","category":"節慶系列","image":"https://metatoylego.com/images/43298-1.jpg","description":"DISNEY-2026 年驚喜月曆・節慶系列・2026年・現貨 NT$909・原封整套／拆售單顆／缺件補件","offers":{"@type":"Offer","url":"https://metatoylego.com/products/43298/","priceCurrency":"TWD","price":909,"availability":"https://schema.org/InStock"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org/","@type":"Product","name":"DISNEY-2026 年驚喜月曆","sku":"43298","category":"節慶系列","image":"https://metatoylego.com/images/43298-1.jpg","description":"DISNEY-2026 年驚喜月曆・節慶系列・2026年・現貨 NT$910・原封整套／拆售單顆／缺件補件","offers":{"@type":"Offer","url":"https://metatoylego.com/products/43298/","priceCurrency":"TWD","price":910,"availability":"https://schema.org/InStock"}}</script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Baloo+2:wght@700;800&display=swap" rel="stylesheet">
 <style>
   :root{ --ink:#1a1a2e; --red:#d2001f; --red-dark:#a5001a; --yellow:#ffcd00; --cream:#fff6e6; --card:#fff; --shadow:4px 4px 0 rgba(26,26,46,0.9); }
@@ -137,14 +137,14 @@
         
         <div class="price-row">
           <span class="orig">NT$1,299</span>
-          <span class="price">NT$909</span>
+          <span class="price">NT$910</span>
         </div>
         <div class="stock">現貨供應</div>
         <div class="action-row">
           <a class="btn-line" href="https://line.me/ti/p/7hy1HnSChM">💬 LINE 詢問這件商品</a>
           <button type="button" class="btn-add-cart" id="add-cart-btn"
             data-sku="43298" data-name="DISNEY-2026 年驚喜月曆"
-            data-price="909" data-stock="10"
+            data-price="910" data-stock="10"
             >
             🛒 加入購物車
           </button>
@@ -215,6 +215,11 @@
         const currentQty = cart[sku] ? cart[sku].qty : 0;
         const original = '🛒 加入購物車';
 
+        if (price <= 0) {
+          addBtn.textContent = '尚未定價';
+          setTimeout(() => { addBtn.textContent = original; }, 1000);
+          return;
+        }
         if (currentQty >= stock) {
           addBtn.textContent = '已達庫存上限';
           setTimeout(() => { addBtn.textContent = original; }, 1000);
