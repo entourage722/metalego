@@ -14,6 +14,14 @@ on:
     - cron: "0 18 * * *"
   workflow_dispatch: {} # 也可以在 GitHub Actions 頁面手動觸發
 
+# 短時間內連續上傳很多張照片時，會一次觸發好幾次執行，如果同時跑，
+# 會發生「兩邊都想 push、其中一邊被拒絕」而整次失敗的狀況。
+# 加上這個設定後，後面觸發的執行會排隊等前一個先跑完、push 完成，
+# 不會再互相搶著 push 導致失敗。
+concurrency:
+  group: compress-images
+  cancel-in-progress: false
+
 permissions:
   contents: write # 要能把壓縮後的照片 commit 回倉庫
 
@@ -51,4 +59,5 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add images/
           git commit -m "自動壓縮商品照片 $(date -u '+%Y-%m-%d %H:%M UTC')"
+          git pull --rebase origin main
           git push
