@@ -1,0 +1,54 @@
+name: 自動壓縮商品照片
+
+# 跟現有的商品頁產生排程是同一套邏輯：偵測變動 → 處理 → commit。
+# 這支負責在 images/ 資料夾有新照片上傳時，自動把過大的照片縮小、
+# 重新壓縮，解決 PageSpeed Insights 抓到的圖片傳送效能問題。
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "images/**"
+  schedule:
+    # 每天凌晨跑一次當作保險，避免漏掉沒被偵測到的照片
+    - cron: "0 18 * * *"
+  workflow_dispatch: {} # 也可以在 GitHub Actions 頁面手動觸發
+
+permissions:
+  contents: write # 要能把壓縮後的照片 commit 回倉庫
+
+jobs:
+  compress:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 拉取倉庫
+        uses: actions/checkout@v4
+
+      - name: 設定 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: 安裝 sharp 圖片處理套件
+        run: npm install sharp --no-save
+
+      - name: 執行圖片壓縮腳本
+        run: node scripts/compress-images.js
+
+      - name: 檢查是否有變動
+        id: check_changes
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit 並 push 變動
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add images/
+          git commit -m "自動壓縮商品照片 $(date -u '+%Y-%m-%d %H:%M UTC')"
+          git push

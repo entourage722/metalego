@@ -4,9 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>你想像的樂高倉庫｜原封整套＋拆售單顆・開倉出清</title>
+<meta name="description" content="樂高整套現貨、拆售單顆、缺件補件，開倉出清中！城市、星際大戰、忍者、科技等各大主題應有盡有，歡迎來訊詢問缺件，LINE 詢問缺件最快速。">
+<link rel="canonical" href="https://metatoylego.com/">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='14' y='6' width='14' height='12' rx='2' fill='%23d2001f' stroke='%231a1a2e' stroke-width='3'/%3E%3Crect x='36' y='6' width='14' height='12' rx='2' fill='%23d2001f' stroke='%231a1a2e' stroke-width='3'/%3E%3Crect x='6' y='16' width='52' height='40' rx='7' fill='%23d2001f' stroke='%231a1a2e' stroke-width='3.5'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet"></noscript>
 <style>
   :root{
     --ink:#1a1a2e;
@@ -17,12 +22,13 @@
     --yellow:#ffcd00;
     --blue:#0057a6;
     --green:#00a550;
-    --line-green:#06c755;
+    --line-green:#037a35;
     --stud:#e8dfc9;
     --shadow: 4px 4px 0 rgba(26,26,46,0.9);
     --shadow-sm: 2px 2px 0 rgba(26,26,46,0.9);
   }
   *{box-sizing:border-box;}
+  .sr-only{position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;}
   html{max-width:100%;}
   body{
     margin:0;
@@ -722,7 +728,7 @@
   .theme-card .studs{display:none;}
   .theme-card .icon{font-size:17px; flex:none; margin:0;}
   .theme-card .name{font-weight:800; font-size:12.5px; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
-  .theme-card .count{font-size:10.5px; color:#888; flex:none; margin:0;}
+  .theme-card .count{font-size:10.5px; color:#707070; flex:none; margin:0;}
 
   /* product grid */
   .product-grid{
@@ -1105,6 +1111,7 @@
             <span class="toggle-track"><span class="toggle-thumb"></span></span>
             隱藏無庫存
           </label>
+          <label for="sort-select" class="sr-only">商品排序</label>
           <select id="sort-select" class="sort-select">
             <option value="">商品排序</option>
             <option value="date-desc">上架時間：由新到舊</option>
@@ -1847,14 +1854,16 @@
       const heading = parts.length ? parts.join("・") : "最新到貨";
       titleEl.textContent = `✪ ${heading}`;
     }
-    products.forEach(p=>{
+    products.forEach((p, idx)=>{
       const isNew = NEWEST_YM ? (p.listedYm === NEWEST_YM) : true;
       const el = document.createElement("div");
       el.className = "product-card" + (p.soldOut ? " is-soldout" : "");
+      const eager = idx < 6; // 第一排先載入，其餘的捲到才載入，減少一開始要下載的圖片總量
       el.innerHTML = `
         ${p.soldOut ? '<div class="tag-soldout">無庫存</div>' : (isNew ? '<div class="tag-new">NEW</div>' : '')}
         <div class="product-thumb">
           <img class="product-thumb-img" src="images/${p.sku}.jpg" alt="${p.name}" data-sku="${p.sku}" data-fallback-icon="${themeIconMap[p.cat] || '🧱'}"
+               width="308" height="308" decoding="async" ${eager ? 'loading="eager" fetchpriority="high"' : 'loading="lazy"'}
                onerror="handleThumbError(this);"
                onload="if(!this.dataset.resolvedSrc) this.dataset.resolvedSrc=this.getAttribute('src');">
           <div class="product-thumb-dots"></div>
