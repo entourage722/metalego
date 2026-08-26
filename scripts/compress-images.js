@@ -32,7 +32,7 @@ const sharp = require("sharp");
 const ROOT = path.resolve(__dirname, "..");
 const IMAGES_DIR = path.join(ROOT, "images");
 const MANIFEST_PATH = path.join(IMAGES_DIR, ".compressed-manifest.json");
-const MAX_DIMENSION = 1200; // 網站最大只會顯示到640px(放大檢視)，留一倍安全空間給高解析度螢幕
+const MAX_DIMENSION = 800; // 網站商品縮圖只顯示到308px，放大檢視也只到640px，800px已經足夠清晰
 const JPEG_QUALITY = 85;
 
 function loadManifest() {
@@ -55,9 +55,11 @@ async function processImage(filePath, manifest) {
   const filename = path.basename(filePath);
   const original = fs.readFileSync(filePath);
   const originalHash = hashBuffer(original);
+  const record = manifest[filename];
 
-  // 上次處理過、檔案內容沒變(沒有重新上傳新照片)，跳過不重複處理
-  if (manifest[filename] === originalHash) {
+  // 上次處理過、檔案內容沒變、而且用的壓縮門檻也一樣，才跳過不重複處理
+  // (以後如果調整 MAX_DIMENSION，門檻對不上就會自動重新處理一次，不用手動清資料)
+  if (record && record.hash === originalHash && record.maxDim === MAX_DIMENSION) {
     return { filename, status: "skip" };
   }
 
@@ -79,13 +81,13 @@ async function processImage(filePath, manifest) {
 
   // 極少數已經很小的圖片，重新編碼後可能反而變大，這種情況保留原檔
   if (output.length >= original.length) {
-    manifest[filename] = originalHash; // 標記為已檢查過，下次不用再比對
+    manifest[filename] = { hash: originalHash, maxDim: MAX_DIMENSION }; // 標記為已檢查過，下次不用再比對
     return { filename, status: "kept-original", before: original.length, after: original.length };
   }
 
   fs.writeFileSync(filePath, output);
   const newHash = hashBuffer(output);
-  manifest[filename] = newHash;
+  manifest[filename] = { hash: newHash, maxDim: MAX_DIMENSION };
   return { filename, status: "compressed", before: original.length, after: output.length };
 }
 
