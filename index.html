@@ -1711,16 +1711,16 @@
   }
   function handleThumbError(img){
     const sku = img.dataset.sku;
-    const stage = img.dataset.stage; // undefined → 剛剛試的是 sku.jpg
+    const stage = img.dataset.stage; // undefined → 剛剛試的是 sku-1.jpg(目前上傳工具的命名慣例)
     if (!stage){
-      img.dataset.stage = "png";
-      img.src = `images/${sku}.png`;
-    } else if (stage === "png"){
-      img.dataset.stage = "jpg1";
-      img.src = `images/${sku}-1.jpg`;
-    } else if (stage === "jpg1"){
+      img.dataset.stage = "jpg0";
+      img.src = `images/${sku}.jpg`; // 退回舊式命名(沒有編號後綴)
+    } else if (stage === "jpg0"){
       img.dataset.stage = "png1";
       img.src = `images/${sku}-1.png`;
+    } else if (stage === "png1"){
+      img.dataset.stage = "png0";
+      img.src = `images/${sku}.png`;
     } else {
       img.outerHTML = `<div class="fallback-icon">${img.dataset.fallbackIcon}</div>`;
     }
@@ -1862,7 +1862,7 @@
       el.innerHTML = `
         ${p.soldOut ? '<div class="tag-soldout">無庫存</div>' : (isNew ? '<div class="tag-new">NEW</div>' : '')}
         <div class="product-thumb">
-          <img class="product-thumb-img" src="images/${p.sku}.jpg" alt="${p.name}" data-sku="${p.sku}" data-fallback-icon="${themeIconMap[p.cat] || '🧱'}"
+          <img class="product-thumb-img" src="images/${p.sku}-1.jpg" alt="${p.name}" data-sku="${p.sku}" data-fallback-icon="${themeIconMap[p.cat] || '🧱'}"
                width="308" height="308" decoding="async" ${eager ? 'loading="eager" fetchpriority="high"' : 'loading="lazy"'}
                onerror="handleThumbError(this);"
                onload="if(!this.dataset.resolvedSrc) this.dataset.resolvedSrc=this.getAttribute('src');">
