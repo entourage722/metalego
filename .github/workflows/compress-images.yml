@@ -52,12 +52,31 @@ jobs:
             echo "changed=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Commit 並 push 變動
+      - name: Commit 並 push 變動（含衝突自動重試）
         if: steps.check_changes.outputs.changed == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add images/
           git commit -m "自動壓縮商品照片 $(date -u '+%Y-%m-%d %H:%M UTC')"
-          git pull --rebase origin main
-          git push
+
+          for attempt in 1 2 3; do
+            if git pull --rebase origin main && git push; then
+              echo "第 $attempt 次嘗試成功 push"
+              exit 0
+            fi
+            echo "第 $attempt 次嘗試失敗，可能是兩次執行剛好處理到同一張圖片，中止 rebase 後重新整理再試一次"
+            git rebase --abort || true
+            git fetch origin main
+            # 用遠端最新版本為準，重新跑一次壓縮腳本，確保這次的圖片是根據最新狀態處理的
+            git reset --hard origin/main
+            node scripts/compress-images.js
+            if [ -z "$(git status --porcelain -- images/)" ]; then
+              echo "重新整理後發現已經沒有需要 commit 的變動（可能已經被別次執行處理掉了），視為成功"
+              exit 0
+            fi
+            git add images/
+            git commit -m "自動壓縮商品照片 $(date -u '+%Y-%m-%d %H:%M UTC')（重試）"
+          done
+          echo "重試 3 次仍然失敗"
+          exit 1
