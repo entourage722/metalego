@@ -304,6 +304,10 @@ function renderProductPage(p, images) {
   .btn-add-cart:disabled{background:#ccc; cursor:not-allowed;}
   .btn-back{display:inline-block; margin-top:18px; color:var(--red-dark); font-weight:700; text-decoration:none; font-size:14px;}
   .note{margin-top:22px; font-size:13px; color:#777; border-top:1px dashed #ddd; padding-top:14px;}
+  .disclaimer-banner{max-width:760px; margin:14px auto 0; background:#fff; border:3px solid var(--ink); border-left:10px solid var(--red); border-radius:8px; box-shadow:2px 2px 0 rgba(26,26,46,0.9); padding:10px 14px; font-size:12.5px; line-height:1.65; color:var(--ink);}
+  .disclaimer-banner strong{color:var(--red-dark);}
+  .disclaimer-banner .en{display:block; margin-top:3px; font-size:11.5px; color:#555;}
+  @media (max-width:800px){ .disclaimer-banner{margin:10px 10px 0;} }
 
   /* ---------- 購物車彈窗（跟首頁樣式一致） ---------- */
   .cart-modal-overlay{display:none; position:fixed; inset:0; background:rgba(26,26,46,0.55); z-index:1000; align-items:center; justify-content:center; padding:16px;}
@@ -356,6 +360,10 @@ function renderProductPage(p, images) {
       </div>
     </div>
   </header>
+  <div class="disclaimer-banner" role="note" aria-label="非官方聲明">
+    <strong>重要聲明：</strong>本站為獨立經營的樂高商品零售網站，<strong>並非 LEGO 集團官方網站</strong>，與 LEGO 集團無任何關聯，也未獲其授權、贊助或背書。LEGO® 及樂高為 LEGO 集團之商標。
+    <span class="en">This is an independent reseller website, not affiliated with, authorized, sponsored or endorsed by the LEGO Group. LEGO® is a trademark of the LEGO Group.</span>
+  </div>
   <main>
     <div class="breadcrumb">
       <a class="cat-btn" href="../../index.html" title="回首頁">

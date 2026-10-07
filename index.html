@@ -934,6 +934,29 @@
     text-align:center;
   }
   footer .foot-contact{margin-bottom:10px; font-weight:700; color:#fff;}
+  footer .foot-disclaimer{max-width:760px; margin:0 auto 12px; font-size:12px; line-height:1.7; color:#ddd;}
+  footer .foot-disclaimer b{color:#fff;}
+
+  /* ---------- 非官方聲明橫幅 ---------- */
+  .disclaimer-wrap{max-width:1180px; margin:14px auto 0; padding:0 16px;}
+  .disclaimer-banner{
+    background:#fff;
+    border:3px solid var(--ink);
+    border-left:10px solid var(--red);
+    border-radius:8px;
+    box-shadow:var(--shadow-sm);
+    padding:10px 14px;
+    font-size:13px;
+    line-height:1.65;
+    color:var(--ink);
+  }
+  .disclaimer-banner strong{color:var(--red-dark);}
+  .disclaimer-banner .en{display:block; margin-top:3px; font-size:11.5px; color:#555;}
+  @media (max-width:600px){
+    .disclaimer-wrap{margin-top:10px; padding:0 10px;}
+    .disclaimer-banner{font-size:12px; padding:8px 10px;}
+    .disclaimer-banner .en{font-size:11px;}
+  }
   footer .foot-links a{margin:0 6px; color:#bbb;}
   footer .foot-links a:hover{color:var(--yellow);}
 </style>
@@ -995,6 +1018,13 @@
         </div>
       </div>
     </nav>
+  </div>
+
+  <div class="disclaimer-wrap">
+    <div class="disclaimer-banner" role="note" aria-label="非官方聲明">
+      <strong>重要聲明：</strong>本站為獨立經營的樂高商品零售網站，<strong>並非 LEGO 集團（The LEGO Group）官方網站</strong>，與 LEGO 集團無任何關聯，也未獲其授權、贊助或背書。LEGO® 及樂高為 LEGO 集團之商標。
+      <span class="en">This is an independent reseller website. It is not the official LEGO® website and is not affiliated with, authorized, sponsored or endorsed by the LEGO Group. LEGO® is a trademark of the LEGO Group.</span>
+    </div>
   </div>
 
   <div class="layout">
@@ -1090,6 +1120,10 @@
               <div class="pickup-addr">台北市中山區龍江路295巷10號</div>
               <div class="pickup-note">預約制</div>
             </div>
+            <div class="pickup-item" style="border-left:6px solid var(--red);">
+              <div class="pickup-name">關於本店</div>
+              <div class="pickup-addr" style="line-height:1.7;">本店為獨立經營的樂高商品零售商，並非 LEGO 集團官方網站，與 LEGO 集團無任何關聯，也未獲其授權、贊助或背書。</div>
+            </div>
           </div>
         </div>
       </div>
@@ -1153,6 +1187,10 @@
     <div class="foot-contact">💬 <a href="https://line.me/ti/p/7hy1HnSChM" style="color:inherit; text-decoration:underline;">LINE 詢問</a>　　🕘 13:00-20:00（週二～週六）</div>
     <div class="foot-links">
       <a href="#" id="about-link-footer">關於本店</a>｜<a href="privacy.html">隱私權說明</a>｜<a href="#">常見問題</a>
+    </div>
+    <div class="foot-disclaimer">
+      <b>非官方聲明：</b>本站為獨立經營的樂高商品零售網站，並非 LEGO 集團官方網站，與 LEGO 集團無任何關聯，亦未獲其授權、贊助或背書。LEGO®、樂高及相關標誌為 LEGO 集團之商標，本站僅為說明所販售商品而使用，不代表任何官方關係。<br>
+      This is an independent reseller website, not affiliated with, authorized, sponsored or endorsed by the LEGO Group. LEGO® is a trademark of the LEGO Group.
     </div>
     <div style="font-size:11px; opacity:.7; margin-bottom:4px;">metatoylego｜你想像的樂高倉庫</div>
     <div>© 你想像的樂高倉庫｜Since 2026・樂高拆售與整套現貨專門</div>
