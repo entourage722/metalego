@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://metatoylego.com/sitemap.xml
+Sitemap: https://vipmetatoy.com/sitemap.xml

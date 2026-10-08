@@ -20,7 +20,7 @@ const fs = require("fs");
 const path = require("path");
 
 const ROOT = path.resolve(__dirname, "..");
-const SITE_URL = "https://metatoylego.com"; // 正式網域，SEO標籤要用完整網址
+const SITE_URL = "https://vipmetatoy.com"; // 正式網域，SEO標籤要用完整網址
 const SPREADSHEET_ID = "1C5-V2M1dn8ljDhwGvNA5wD0kNCu_HOdEHnRsgZ9TlBs";
 const GID = "1498552544";
 const SHEETS_API_KEY = process.env.SHEETS_API_KEY;
@@ -214,7 +214,7 @@ function escapeHtml(str) {
 
 function renderProductPage(p, images) {
   const url = `${SITE_URL}/products/${p.sku}/`;
-  const title = `${p.name}（${p.sku}）｜你想像的樂高倉庫`;
+  const title = `${p.name}（${p.sku}）｜vipmetatoy`;
   const priceText = `NT$${p.price.toLocaleString()}`;
   const descParts = [p.name, p.cat, p.year ? `${p.year}年` : "", p.pieces ? `${p.pieces.toLocaleString()}pcs` : "", p.soldOut ? "目前無庫存" : `現貨 ${priceText}`, "原封整套／拆售單顆／缺件補件"];
   const description = descParts.filter(Boolean).join("・");
@@ -348,7 +348,7 @@ function renderProductPage(p, images) {
           <rect x="6" y="16" width="52" height="40" rx="7" fill="#d2001f" stroke="#1a1a2e" stroke-width="3.5"/>
         </svg>
         <div class="logo-text">
-          <div class="title">你想像的樂高倉庫</div>
+          <div class="title">vipmetatoy</div>
           <div class="subtitle">原封整套・拆售單顆・缺件補件・開倉出清！</div>
         </div>
       </a>

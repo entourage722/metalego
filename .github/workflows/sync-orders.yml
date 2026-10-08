@@ -20,7 +20,7 @@ jobs:
       - name: 呼叫同步端點
         run: |
           http_code=$(curl -s -o /tmp/resp.json -w "%{http_code}" \
-            -X POST "https://metatoylego.com/api/sync-orders" \
+            -X POST "https://metalego.pages.dev/api/sync-orders" \
             -H "x-sync-secret: ${{ secrets.SYNC_SECRET }}")
           echo "HTTP status: $http_code"
           cat /tmp/resp.json
